@@ -1,0 +1,38 @@
+{
+  "and_data": [
+      {
+        "input": [-1, 1],
+        "expected_output": -1
+      },
+      {
+        "input": [1, -1],
+        "expected_output": -1
+      },
+      {
+        "input": [1, 1],
+        "expected_output": 1
+      },
+      {
+        "input": [-1, -1],
+        "expected_output": -1
+      }
+  ],
+  "xor_data": [
+      {
+        "input": [-1, 1],
+        "expected_output": 1
+      },
+      {
+        "input": [1, -1],
+        "expected_output": 1
+      },
+      {
+        "input": [1, 1],
+        "expected_output": -1
+      },
+      {
+        "input": [-1, -1],
+        "expected_output": -1
+      }
+    ]
+}
