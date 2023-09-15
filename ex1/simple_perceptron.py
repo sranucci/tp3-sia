@@ -1,52 +1,38 @@
-import sys
-from random import randint
-
-import numpy as np
+from perceptron import generate_results
 
 
-def simple_perceptron(data, limit=100000):
-    data_size = get_size(data[0]["input"])
-    iterations = 0
-    weights = initialize_weights(data_size)
-    min_error = sys.maxsize  # very high number
-    learning_constant = 0.1  # TODO parametrize
+def update_weights_simple(learning_constant, activation, data_input, data_expected_output, weights):
 
-    while min_error > 0 and iterations < limit:
-        random_number = randint(0, data_size - 1)
-        x_vector = np.array(data[random_number]["input"])  # convert x from array to numpy (to make vectorial operations)
-        x_vector = np.insert(x_vector, 0, 1)  # add 1 at the beggining of the vector to calculate stuff in vectorial way
-
-        activation = compute_activation(x_vector, weights)
-        update_weights(learning_constant, activation, data[random_number], weights)
-
-        error = compute_error(data, weights)
-        if error < min_error:
-            min_error = error
-            w_min = weights
-
-        iterations += 1
+    if data_expected_output != activation:
+        weights += learning_constant * (data_expected_output - activation) * data_input
 
 
-def compute_excitement(x_vector, weights):
-    return np.dot(x_vector, weights)
+# Activation function
+def theta_simple(x):
+    return 1 if x >= 0 else -1
 
 
-def compute_activation(x_vector, weights):
-    return 1 if compute_excitement(x_vector, weights) >= 0 else 0
+# --------------------- error calculations --------------------------
+
+def accuracy_error_simple(data_input, weights, data_output, theta):
+    generated_results = generate_results(data_input, weights, theta)
+
+    count = 0
+
+    for generated, expected in zip(generated_results, data_output):
+        if generated == expected:
+            count += 1
+
+    return 1 - count / len(generated_results) # si accuracy es 100% => 1 - 1 => 0
 
 
-def update_weights(learning_constant, activation, data, weights):
-    weights += 2 * learning_constant * data["input"] * (data["expected_output"] - activation)
+def module_error_simple(data_input, weights, data_output, theta):
+    generated_results = generate_results(data_input, weights, theta)
 
+    diff = 0
+    for generated, expected in zip(generated_results, data_output):
+        diff += abs(generated - expected)
 
-def compute_error(data, weights):
-    return 1  # TODO
+    return diff
 
-
-def initialize_weights(data_size):
-    return np.zeros(data_size)
-
-
-# amount of weights should be len(input) + 1
-def get_size(data):
-    return len(data) + 1
+# ----------------------------------------------------------------
