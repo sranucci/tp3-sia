@@ -21,18 +21,18 @@ def initialize_weights(data_size):
     return np.array(weights)
 
 
-def generate_results(data_input, weights, theta):
+def generate_results(data_input, weights, theta, beta):
     generated_results = []
     for elem in data_input:
-        generated_results.append(theta(np.dot(elem, weights)))
+        generated_results.append(theta(np.dot(elem, weights), beta))
     return generated_results
 
 
-def compute_activation(x_vector, weights, theta):
-    return theta(np.dot(x_vector, weights))
+def compute_activation(x_vector, weights, theta, beta):
+    return theta(np.dot(x_vector, weights), beta)
 
 
-def perceptron(data_input, data_output, learning_constant, epsilon, update_weights, compute_error, theta, limit=100000):
+def perceptron(data_input, data_output, learning_constant, epsilon, update_weights, compute_error, theta, limit=100000, beta=1, theta_derivative=None):
     data_size = len(data_input[0])
     iterations = 0
     weights = initialize_weights(data_size + 1)  # tenemos el w0 tambien
@@ -49,11 +49,11 @@ def perceptron(data_input, data_output, learning_constant, epsilon, update_weigh
 
         x_vector = converted_input[idx]  # convert x from array to numpy (to make vectorial operations)
 
-        activation = compute_activation(x_vector, weights, theta)
+        activation = compute_activation(x_vector, weights, theta, beta)
 
-        update_weights(learning_constant, activation, converted_input[idx], data_output[idx], weights)
+        update_weights(learning_constant, activation, converted_input[idx], data_output[idx], weights, theta_derivative, beta)
 
-        error = compute_error(converted_input, weights, data_output, theta)
+        error = compute_error(converted_input, weights, data_output, theta, beta)
 
         collect_metrics(metrics, weights)
 
