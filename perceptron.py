@@ -1,7 +1,10 @@
 import copy
+import json
 import sys
 from random import randint
 import numpy as np
+from datetime import datetime
+
 
 def convert_input(data_input):
     converted_array = []
@@ -36,6 +39,8 @@ def perceptron(data_input, data_output, learning_constant, epsilon, update_weigh
     weights = initialize_weights(data_size + 1)  # tenemos el w0 tambien
     min_error = float("inf")
     w_min = []
+    metrics = {}
+    metrics["weights"] = []
 
     converted_input = convert_input(data_input)
 
@@ -50,6 +55,8 @@ def perceptron(data_input, data_output, learning_constant, epsilon, update_weigh
 
         error = compute_error(converted_input, weights, data_output, theta)
 
+        collect_metrics(metrics, weights)
+
         if error < min_error:
             min_error = error
             w_min = copy.copy(weights)
@@ -58,8 +65,19 @@ def perceptron(data_input, data_output, learning_constant, epsilon, update_weigh
 
     print(f"min error {min_error} and epsilon {epsilon}")
     print(f"iterations {iterations} and limit {limit}")
+    export_metrics(metrics)
 
     return w_min
+
+
+def collect_metrics(metrics, weights):
+    metrics["weights"].append(weights.tolist())
+
+
+def export_metrics(metrics):
+    now = datetime.now().strftime("%d-%m-%Y_%H%M%S")
+    with open(f"../results/results_{now}.json", mode="w+") as file:
+        file.write(json.dumps(metrics, indent=4))
 
 
 

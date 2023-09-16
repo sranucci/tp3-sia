@@ -1,6 +1,6 @@
-import json
 from perceptron import perceptron
 from simple_perceptron import *
+
 
 
 def main():
@@ -15,3 +15,6 @@ def main():
     print(w_min)
 
 main()
+
+
+
