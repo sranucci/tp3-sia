@@ -1,6 +1,5 @@
 import copy
 import json
-import sys
 from random import randint
 import numpy as np
 from datetime import datetime
@@ -18,7 +17,7 @@ def convert_input(data_input):
 def initialize_weights(data_size):
     weights = []
     for _ in range(data_size):
-        weights.append(np.random.uniform(-1, 1))  # TODO check
+        weights.append(np.random.uniform(-10, 10))  # TODO check
     return np.array(weights)
 
 
