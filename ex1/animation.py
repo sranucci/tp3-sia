@@ -5,7 +5,7 @@ import os
 import json
 
 
-def animate_lines(input_data, file_name=None):
+def animate_lines(input_data, gif_name, file_name=None):
     if file_name is None:
         path = "../results"
         files = os.listdir(path)
@@ -59,7 +59,7 @@ def animate_lines(input_data, file_name=None):
     ani = FuncAnimation(fig, update, frames=len(results['weights']), init_func=init, interval=1000)
 
     # Save the animation as a GIF
-    ani.save('line_animation.gif', writer='pillow', fps=1)
+    ani.save(f'{gif_name}.gif', writer='pillow', fps=2)
 
     # Display the animation (optional)
     plt.show()
