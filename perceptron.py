@@ -40,6 +40,7 @@ def perceptron(data_input, data_output, learning_constant, epsilon, update_weigh
     w_min = []
     metrics = {}
     metrics["weights"] = []
+    collect_metrics(metrics, weights)
 
     converted_input = convert_input(data_input)
 
