@@ -10,7 +10,7 @@ def animate_lines(input_data, file_name=None):
         path = "../results"
         files = os.listdir(path)
         files.sort()
-        file_name = f"{path}/{files[-1]}"
+        file_name = f"{path}/{files[-2]}"
 
     with open(file_name) as file:
         results = json.load(file)
@@ -47,7 +47,13 @@ def animate_lines(input_data, file_name=None):
         # Update the input coordinates
         scatter.set_offsets(input_data)
 
-        ax.legend()
+        # Update the legend with the line number
+        legend_label = f'Line {frame + 1} (W0={w0:.2f}, W1={w1:.2f}, W2={w2:.2f})'
+        ax.legend([legend_label])
+
+        # Add labels next to each point
+        for i, (xi, yi) in enumerate(input_data):
+            ax.annotate(f'({xi}, {yi})', (xi, yi), textcoords="offset points", xytext=(10, 10), fontsize=8)
 
     # Create the animation
     ani = FuncAnimation(fig, update, frames=len(results['weights']), init_func=init, interval=1000)
@@ -58,6 +64,3 @@ def animate_lines(input_data, file_name=None):
     # Display the animation (optional)
     plt.show()
 
-
-input_data2 = [[-1, 1], [1, -1], [1, 1], [-1, -1]]
-animate_lines(input_data2)
