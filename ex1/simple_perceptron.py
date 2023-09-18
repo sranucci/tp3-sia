@@ -35,3 +35,9 @@ def module_error_simple(data_input, weights, data_output, theta, beta):
     return diff
 
 # ----------------------------------------------------------------
+
+
+def collect_metrics(metrics, weights, error, iteration):
+    metrics["weights"].append(weights.tolist())
+    metrics["error"].append(error)
+    metrics["iteration"] = iteration

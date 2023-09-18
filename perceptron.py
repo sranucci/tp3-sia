@@ -32,15 +32,15 @@ def compute_activation(x_vector, weights, theta, beta):
     return theta(np.dot(x_vector, weights), beta)
 
 
-def perceptron(data_input, data_output, learning_constant, epsilon, update_weights, compute_error, theta, limit=100000, beta=1, theta_derivative=None):
+def perceptron(data_input, data_output, learning_constant, epsilon, update_weights, compute_error, theta, collect_metrics, limit=100000, beta=1, theta_derivative=None):
     data_size = len(data_input[0])
     iterations = 0
     weights = initialize_weights(data_size + 1)  # tenemos el w0 tambien
     min_error = float("inf")
     w_min = []
     metrics = {}
-    metrics["weights"] = []
-    collect_metrics(metrics, weights)
+    initialize_metrics(metrics)
+    collect_metrics(metrics, weights, -1, 0)
 
     converted_input = convert_input(data_input)
 
@@ -55,7 +55,7 @@ def perceptron(data_input, data_output, learning_constant, epsilon, update_weigh
 
         error = compute_error(converted_input, weights, data_output, theta, beta)
 
-        collect_metrics(metrics, weights)
+        collect_metrics(metrics, weights, error, iterations+1)
 
         if error < min_error:
             min_error = error
@@ -63,25 +63,17 @@ def perceptron(data_input, data_output, learning_constant, epsilon, update_weigh
 
         iterations += 1
 
-    print(f"min error {min_error} and epsilon {epsilon}")
-    print(f"iterations {iterations} and limit {limit}")
-    export_metrics(metrics)
+    return w_min, metrics
 
-    return w_min
+
+def initialize_metrics(metrics):
+    metrics["error"] = []
+    metrics["weights"] = []
+    metrics["iteration"] = 0
 
 
 def generalization(test_input, test_output, weights, compute_error, theta, beta):
     return compute_error(test_input, weights, test_output, theta, beta)
-
-
-def collect_metrics(metrics, weights):
-    metrics["weights"].append(weights.tolist())
-
-
-def export_metrics(metrics):
-    now = datetime.now().strftime("%d-%m-%Y_%H%M%S")
-    with open(f"../results/results_{now}.json", mode="w+") as file:
-        file.write(json.dumps(metrics, indent=4))
 
 
 
