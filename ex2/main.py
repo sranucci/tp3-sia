@@ -40,13 +40,36 @@ def test_weights(input_test_data, output_test_data, weights, config):
                                    config["beta"])
         elif config["method"]["theta"] == "logistic":
             error = generalization(input_test_data, output_test_data, weights, error_non_linear, theta_logistic,
-                                   config["beta"])
+                                   config["method"]["beta"])
         else:
             quit("Invalid theta")
     else:
         quit("Invalid method type")
 
     return error
+
+def run_algorithm_with_kfold(input_data, output_data,config):
+    min_error = None
+    for fold in range(len(input_data)):
+
+        #TODO RANA: ver tenma de la conversion que esta tirando excepcion
+        min_weights = run_algorithm(input_data[fold],output_data[fold],config)
+        #creamos los datos de testeo, todos menos el k_fold
+        input_test_data = []
+        output_test_data = []
+        for item in range(len(input_data)):
+            if item != fold:
+                for j in range(len(input_data[item])):
+                    input_test_data.append(input_data[item][j])
+                    output_test_data.append(output_data[item][j])
+
+        error = test_weights(input_test_data,output_test_data,min_weights,config)
+        if min_error is None or error < min_error:
+            min_error = error
+
+
+    return min_error
+
 
 
 def main():
@@ -77,6 +100,7 @@ def main():
 
     elif config["selection_method"]["type"] == "k-fold":
         input_data, output_data = k_fold(input_data, output_data, config["selection_method"]["folds"])
+        print(run_algorithm_with_kfold(input_data,output_data,config))
     else:
         quit("Invalid selection method")
 
