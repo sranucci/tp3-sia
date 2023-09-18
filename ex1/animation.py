@@ -59,7 +59,7 @@ def animate_lines(input_data, gif_name, file_name=None):
     ani = FuncAnimation(fig, update, frames=len(results['weights']), init_func=init, interval=1000)
 
     # Save the animation as a GIF
-    ani.save(f'{gif_name}.gif', writer='pillow', fps=2)
+    ani.save(f'./gifs/{gif_name}.gif', writer='pillow', fps=2)
 
     # Display the animation (optional)
     plt.show()
