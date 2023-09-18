@@ -73,7 +73,8 @@ def initialize_metrics(metrics):
 
 
 def generalization(test_input, test_output, weights, compute_error, theta, beta):
-    return compute_error(test_input, weights, test_output, theta, beta)
+    converted_input = convert_input(test_input)
+    return compute_error(converted_input, weights, test_output, theta, beta)
 
 
 

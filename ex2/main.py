@@ -7,22 +7,28 @@ import csv
 from selection_methods import *
 
 
+def collect_metrics(metrics, weights, error, iterations):
+    # TODO: completar
+    pass
+
+
 def run_algorithm(input_data, output_data, config):
     # Corremos los algoritmos
     if config["method"]["type"] == "linear":
-        min_weights = perceptron(input_data, output_data, config["learning_constant"], config["epsilon"],
-                                 update_weights_linear, error_linear, theta_linear, config["limit"], 1)
+        min_weights, metrics = perceptron(input_data, output_data, config["learning_constant"], config["epsilon"],
+                                 update_weights_linear, error_linear, theta_linear, collect_metrics,
+                                 config["limit"], 1)
 
     elif config["method"]["type"] == "non_linear":
         if config["method"]["theta"] == "tanh":
-            min_weights = perceptron(input_data, output_data, config["learning_constant"], config["epsilon"],
-                                     update_weights_non_linear, error_non_linear, theta_logistic, config["limit"],
-                                     config["method"]["beta"], theta_tanh_derivative)
+            min_weights, metrics = perceptron(input_data, output_data, config["learning_constant"], config["epsilon"],
+                                     update_weights_non_linear, error_non_linear, theta_logistic, collect_metrics,
+                                     config["limit"], config["method"]["beta"], theta_tanh_derivative)
 
         elif config["method"]["theta"] == "logistic":
-            min_weights = perceptron(input_data, output_data, config["learning_constant"], config["epsilon"],
-                                     update_weights_non_linear, error_non_linear, theta_tanh, config["limit"],
-                                     config["method"]["beta"], theta_logistic_derivative)
+            min_weights, metrics = perceptron(input_data, output_data, config["learning_constant"], config["epsilon"],
+                                     update_weights_non_linear, error_non_linear, theta_tanh, collect_metrics,
+                                     config["limit"], config["method"]["beta"], theta_logistic_derivative)
         else:
             quit("Invalid theta")
     else:
@@ -36,11 +42,9 @@ def test_weights(input_test_data, output_test_data, weights, config):
         error = generalization(input_test_data, output_test_data, weights, error_linear, theta_linear, 1)
     elif config["method"]["type"] == "non_linear":
         if config["method"]["theta"] == "tanh":
-            error = generalization(input_test_data, output_test_data, weights, error_non_linear, theta_logistic,
-                                   config["beta"])
+            error = generalization(input_test_data, output_test_data, weights, error_non_linear, theta_tanh, config["method"]["beta"])
         elif config["method"]["theta"] == "logistic":
-            error = generalization(input_test_data, output_test_data, weights, error_non_linear, theta_logistic,
-                                   config["method"]["beta"])
+            error = generalization(input_test_data, output_test_data, weights, error_non_linear, theta_logistic, config["method"]["beta"])
         else:
             quit("Invalid theta")
     else:
