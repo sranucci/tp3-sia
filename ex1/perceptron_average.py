@@ -2,12 +2,11 @@ from perceptron import perceptron
 from simple_perceptron import *
 import os
 import json
-import matplotlib.pyplot as plt
+import plotly.graph_objects as go
 import numpy as np
 
-
 def average_accuracy():
-    LIMIT = 100
+    LIMIT = 25
     error_each_iteration = [[] for _ in range(LIMIT+1)]
     for _ in range(100):
         input_data_and = [[-1, 1], [1, -1], [1, 1], [-1, -1]]
@@ -29,22 +28,27 @@ def average_accuracy():
     mean_array = mean_array[1:]
     std_array = std_array[1:]
 
-    #Create an array of x-values for the bars (e.g., categories or labels)
+    # Create an array of x-values for the bars (e.g., categories or labels)
     x_values = np.arange(len(mean_array))
 
-    # Create the bar chart with error bars
-    plt.bar(x_values, mean_array, yerr=std_array, capsize=10, color='b', alpha=0.7)
+    # Create the bar chart with error bars using Plotly
+    fig = go.Figure(data=[
+        go.Bar(
+            x=x_values,
+            y=mean_array,
+            error_y=dict(type='data', array=std_array, visible=True),
+            marker=dict(color='blue', opacity=0.7)
+        )
+    ])
 
     # Customize the plot
-    # plt.xticks(x_values, ['Category 1', 'Category 2', 'Category 3', 'Category 4'])  # Replace labels as needed
-    plt.xlabel('Iteration')
-    plt.ylabel('Accuracy')
-    plt.title('Mean accuracy for each iteration')
+    fig.update_layout(
+        xaxis_title='Iteration',
+        yaxis_title='Accuracy',
+        title='Mean accuracy for each iteration'
+    )
 
-    # Show the plot
-    plt.show()
+    # Show the interactive plot in a Jupyter Notebook or an HTML file
+    fig.show()
 
 average_accuracy()
-
-
-
