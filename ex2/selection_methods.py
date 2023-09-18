@@ -28,12 +28,16 @@ def k_fold(input_data, output_data, folds):
     #particionamos en K conjuntos
     current_data_idx = 0
     for fold_number in range(folds):
-        current_inp_list = new_input_data[fold_number] = []
-        current_output_list = new_output_data[fold_number] = []
-        while current_data_idx % items_per_fold != 0:
+        new_input_data.append([])
+        new_output_data.append([])
+        current_inp_list = new_input_data[fold_number]
+        current_output_list = new_output_data[fold_number]
+        current_item = 0
+        while current_item != items_per_fold :
             current_inp_list.append(input_data[current_data_idx])
             current_output_list.append(output_data[current_data_idx])
             current_data_idx += 1
+            current_item += 1
 
     for fold_number_remaining in range(reminding_items):
         new_input_data[fold_number_remaining].append(input_data[current_data_idx])
