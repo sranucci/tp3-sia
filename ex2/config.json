@@ -8,5 +8,10 @@
     "type": "non_linear",
     "theta": "logistic",
     "beta": 0.3
+  },
+  "selection_method": {
+    "type": "k-fold",
+    "proportion": 0.5,
+    "folds": 5
   }
 }

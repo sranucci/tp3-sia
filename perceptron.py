@@ -70,6 +70,10 @@ def perceptron(data_input, data_output, learning_constant, epsilon, update_weigh
     return w_min
 
 
+def generalization(test_input, test_output, weights, compute_error, theta, beta):
+    return compute_error(test_input, weights, test_output, theta, beta)
+
+
 def collect_metrics(metrics, weights):
     metrics["weights"].append(weights.tolist())
 
