@@ -1,0 +1,12 @@
+{
+  "seed": -1,
+  "training_data": "../training_data/ex2.csv",
+  "learning_constant": 0.5,
+  "limit": 100000,
+  "epsilon": 1000,
+  "method": {
+    "type": "non_linear",
+    "theta": "logistic",
+    "beta": 0.3
+  }
+}
