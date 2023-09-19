@@ -10,8 +10,8 @@
     "beta": 0.3
   },
   "selection_method": {
-    "type": "k-fold",
-    "proportion": 0.5,
+    "type": "simple",
+    "proportion": 0.9,
     "folds": 5
   }
 }

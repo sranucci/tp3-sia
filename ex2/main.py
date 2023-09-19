@@ -16,19 +16,20 @@ def run_algorithm(input_data, output_data, config):
     # Corremos los algoritmos
     if config["method"]["type"] == "linear":
         min_weights, metrics = perceptron(input_data, output_data, config["learning_constant"], config["epsilon"],
-                                 update_weights_linear, error_linear, theta_linear, collect_metrics,
-                                 config["limit"], 1)
+                                          update_weights_linear, error_linear, theta_linear, collect_metrics,
+                                          config["limit"], 1)
 
     elif config["method"]["type"] == "non_linear":
         if config["method"]["theta"] == "tanh":
             min_weights, metrics = perceptron(input_data, output_data, config["learning_constant"], config["epsilon"],
-                                     update_weights_non_linear, error_non_linear, theta_logistic, collect_metrics,
-                                     config["limit"], config["method"]["beta"], theta_tanh_derivative)
+                                              update_weights_non_linear, error_non_linear, theta_logistic,
+                                              collect_metrics,
+                                              config["limit"], config["method"]["beta"], theta_tanh_derivative)
 
         elif config["method"]["theta"] == "logistic":
             min_weights, metrics = perceptron(input_data, output_data, config["learning_constant"], config["epsilon"],
-                                     update_weights_non_linear, error_non_linear, theta_tanh, collect_metrics,
-                                     config["limit"], config["method"]["beta"], theta_logistic_derivative)
+                                              update_weights_non_linear, error_non_linear, theta_tanh, collect_metrics,
+                                              config["limit"], config["method"]["beta"], theta_logistic_derivative)
         else:
             quit("Invalid theta")
     else:
@@ -42,9 +43,11 @@ def test_weights(input_test_data, output_test_data, weights, config):
         error = generalization(input_test_data, output_test_data, weights, error_linear, theta_linear, 1)
     elif config["method"]["type"] == "non_linear":
         if config["method"]["theta"] == "tanh":
-            error = generalization(input_test_data, output_test_data, weights, error_non_linear, theta_tanh, config["method"]["beta"])
+            error = generalization(input_test_data, output_test_data, weights, error_non_linear, theta_tanh,
+                                   config["method"]["beta"])
         elif config["method"]["theta"] == "logistic":
-            error = generalization(input_test_data, output_test_data, weights, error_non_linear, theta_logistic, config["method"]["beta"])
+            error = generalization(input_test_data, output_test_data, weights, error_non_linear, theta_logistic,
+                                   config["method"]["beta"])
         else:
             quit("Invalid theta")
     else:
@@ -52,13 +55,14 @@ def test_weights(input_test_data, output_test_data, weights, config):
 
     return error
 
-def run_algorithm_with_kfold(input_data, output_data,config):
+
+def run_algorithm_with_kfold(input_data, output_data, config):
     min_error = None
     for fold in range(len(input_data)):
 
-        #TODO RANA: ver tenma de la conversion que esta tirando excepcion
-        min_weights = run_algorithm(input_data[fold],output_data[fold],config)
-        #creamos los datos de testeo, todos menos el k_fold
+        # TODO RANA: ver tenma de la conversion que esta tirando excepcion
+        min_weights = run_algorithm(input_data[fold], output_data[fold], config)
+        # creamos los datos de testeo, todos menos el k_fold
         input_test_data = []
         output_test_data = []
         for item in range(len(input_data)):
@@ -67,13 +71,11 @@ def run_algorithm_with_kfold(input_data, output_data,config):
                     input_test_data.append(input_data[item][j])
                     output_test_data.append(output_data[item][j])
 
-        error = test_weights(input_test_data,output_test_data,min_weights,config)
+        error = test_weights(input_test_data, output_test_data, min_weights, config)
         if min_error is None or error < min_error:
             min_error = error
 
-
     return min_error
-
 
 
 def main():
@@ -103,10 +105,12 @@ def main():
         error = test_weights(input_test_data, output_test_data, min_weights, config)
 
     elif config["selection_method"]["type"] == "k-fold":
-        input_data, output_data = k_fold(input_data, output_data, config["selection_method"]["folds"])
-        print(run_algorithm_with_kfold(input_data,output_data,config))
+        input_data, output_data = k_fold_selection(input_data, output_data, config["selection_method"]["folds"])
+
+        error = run_algorithm_with_kfold(input_data, output_data, config)
     else:
         quit("Invalid selection method")
 
+    print(error)
 
 main()

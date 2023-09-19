@@ -14,10 +14,10 @@ def simple_selection(input_data, output_data, proportion):
             new_output_test_data.append(output)
         count += 1
 
-    return new_input_data, new_output_data, new_input_test_data, new_input_test_data
+    return new_input_data, new_output_data, new_input_test_data, new_output_test_data
 
 
-def k_fold(input_data, output_data, folds):
+def k_fold_selection(input_data, output_data, folds):
     new_input_data = []
     new_output_data = []
     total_items = len(input_data)
