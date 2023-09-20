@@ -13,13 +13,12 @@ class NeuronLayer:
         self.weights = np.array(weights)
 
     def compute_activation(self, prev_input):
-        prev_input = np.transpose(prev_input)
-        result = self.weights @ prev_input    # dot product of vectors
+        result = np.dot(self.weights,prev_input)    # dot product of vectors
 
         # TODO: ver si se puede hacer mas eficiente
         output = [self.activation_function(elem) for elem in result]
 
-        return np.array([output])
+        return np.array(output)
 
 
 class MultiPerceptron:
@@ -42,7 +41,6 @@ class MultiPerceptron:
 
     def forward_propagation(self, input_data):
         current = np.array(input_data)
-        current = np.transpose(current)
 
         for layer in self.layers:
             current = layer.compute_activation(current)
