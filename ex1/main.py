@@ -2,7 +2,7 @@ import copy
 import json
 from datetime import datetime
 
-from perceptron import perceptron
+from perceptrons.single_perceptron import perceptron
 from simple_perceptron import *
 from animation import animate_lines
 

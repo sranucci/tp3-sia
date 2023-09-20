@@ -1,7 +1,7 @@
 import math
 
 from ex2.linear_perceptron import error_linear
-from perceptron import compute_activation
+from perceptrons.single_perceptron import compute_activation
 
 
 def theta_tanh(x, beta):

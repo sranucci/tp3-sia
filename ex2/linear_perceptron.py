@@ -1,4 +1,4 @@
-from perceptron import compute_activation
+from perceptrons.single_perceptron import compute_activation
 
 
 def theta_linear(x, beta):

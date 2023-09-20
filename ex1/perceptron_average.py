@@ -1,7 +1,5 @@
-from perceptron import perceptron
+from perceptrons.single_perceptron import perceptron
 from simple_perceptron import *
-import os
-import json
 import plotly.graph_objects as go
 import numpy as np
 

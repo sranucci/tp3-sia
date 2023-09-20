@@ -1,4 +1,4 @@
-from perceptron import generate_results
+from perceptrons.single_perceptron import generate_results
 
 
 def update_weights_simple(learning_constant, activation, data_input, data_expected_output, weights, theta_derivative, beta):
