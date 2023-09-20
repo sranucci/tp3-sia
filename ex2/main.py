@@ -60,18 +60,18 @@ def run_algorithm_with_kfold(input_data, output_data, config):
     min_error = None
     for fold in range(len(input_data)):
 
-        # TODO RANA: ver tenma de la conversion que esta tirando excepcion
-        min_weights = run_algorithm(input_data[fold], output_data[fold], config)
-        # creamos los datos de testeo, todos menos el k_fold
-        input_test_data = []
-        output_test_data = []
+        input_training_data = []
+        output_training_data = []
         for item in range(len(input_data)):
             if item != fold:
-                for j in range(len(input_data[item])):
-                    input_test_data.append(input_data[item][j])
-                    output_test_data.append(output_data[item][j])
+                input_training_data.extend(input_data[item])
+                output_training_data.extend(output_data[item])
 
-        error = test_weights(input_test_data, output_test_data, min_weights, config)
+        # TODO RANA: ver tenma de la conversion que esta tirando excepcion
+        min_weights = run_algorithm(input_training_data, output_training_data, config)
+        # creamos los datos de testeo, todos menos el k_fold
+
+        error = test_weights(input_data[fold], output_data[fold], min_weights, config)
         if min_error is None or error < min_error:
             min_error = error
 
@@ -112,5 +112,6 @@ def main():
         quit("Invalid selection method")
 
     print(error)
+
 
 main()

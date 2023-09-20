@@ -8,8 +8,8 @@ from datetime import datetime
 def convert_input(data_input):
     converted_array = []
     for elem in data_input:
-        elem.insert(0, 1)
-        converted = np.array(elem)
+        convertible = [1, *elem]
+        converted = np.array(convertible)
         converted_array.append(converted)
     return converted_array
 
@@ -32,7 +32,8 @@ def compute_activation(x_vector, weights, theta, beta):
     return theta(np.dot(x_vector, weights), beta)
 
 
-def perceptron(data_input, data_output, learning_constant, epsilon, update_weights, compute_error, theta, collect_metrics, limit=100000, beta=1, theta_derivative=None):
+def perceptron(data_input, data_output, learning_constant, epsilon, update_weights, compute_error, theta,
+               collect_metrics, limit=100000, beta=1, theta_derivative=None):
     data_size = len(data_input[0])
     iterations = 0
     weights = initialize_weights(data_size + 1)  # tenemos el w0 tambien
@@ -48,14 +49,14 @@ def perceptron(data_input, data_output, learning_constant, epsilon, update_weigh
         idx = randint(0, data_size - 1)
 
         x_vector = converted_input[idx]  # convert x from array to numpy (to make vectorial operations)
-
         activation = compute_activation(x_vector, weights, theta, beta)
 
-        update_weights(learning_constant, activation, converted_input[idx], data_output[idx], weights, theta_derivative, beta)
+        update_weights(learning_constant, activation, converted_input[idx], data_output[idx], weights, theta_derivative,
+                       beta)
 
         error = compute_error(converted_input, weights, data_output, theta, beta)
 
-        collect_metrics(metrics, weights, error, iterations+1)
+        collect_metrics(metrics, weights, error, iterations + 1)
 
         if error < min_error:
             min_error = error
@@ -75,6 +76,3 @@ def initialize_metrics(metrics):
 def generalization(test_input, test_output, weights, compute_error, theta, beta):
     converted_input = convert_input(test_input)
     return compute_error(converted_input, weights, test_output, theta, beta)
-
-
-
