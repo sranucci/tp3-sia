@@ -63,11 +63,13 @@ class MultiPerceptron:
             layer.weights += delta_w[idx]
 
 
+    def compute_error(self, data_input, expected_outputs):
 
-    def compute_error(self, expected_outputs):
-        output = self.layers[-1].output
+        error_vector = []
 
-        error_vector = np.power(expected_outputs - output, 2)
+        for idx, input in enumerate(data_input):
+            output_result = self.forward_propagation(input)
+            error_vector.append(np.power(expected_outputs[idx] - output_result, 2))
 
         return 0.5 * sum(error_vector)
 
