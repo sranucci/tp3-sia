@@ -14,7 +14,7 @@ class NeuronLayer:
         for i in range(current_layer_neurons_amount):
             weights.append([])
             for j in range(previous_layer_neuron_amount):
-                weights[i].append(random.uniform(-100, 100))
+                weights[i].append(random.uniform(-2, 2))
         self.weights = np.array(weights)
 
     def compute_activation(self, prev_input):
@@ -62,7 +62,6 @@ class MultiPerceptron:
         for idx, layer in enumerate(self.layers):
             layer.weights += delta_w[idx]
 
-
     def compute_error(self, data_input, expected_outputs):
 
         error_vector = []
@@ -71,7 +70,11 @@ class MultiPerceptron:
             output_result = self.forward_propagation(input)
             error_vector.append(np.power(expected_outputs[idx] - output_result, 2))
 
-        return 0.5 * sum(error_vector)
+        total = 0
+        for elem in error_vector:
+            total += sum(elem)
+
+        return 0.5 * total
 
     def back_propagation(self, expected_output, generated_output) -> list:
         delta_w = []

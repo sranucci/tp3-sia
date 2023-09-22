@@ -1,12 +1,9 @@
+import math
 import random
 
 from perceptrons.multi_perceptron import MultiPerceptron
 import ex2.non_linear_perceptron as nlp
 import numpy as np
-
-
-def theta(x):
-    return x
 
 
 # def initialize_weights(layer_amounts):
@@ -57,6 +54,20 @@ def theta(x):
 
 # ----------------------------------------------------
 
+def theta_logistic(x):
+    try:
+        a = math.exp(-2 * x * 1)
+    except OverflowError:
+        a = float("inf")
+    return 1 / (1 + a)
+
+def theta_logistic_derivative(x):
+    theta_result = theta_logistic(x)
+    return 2 * 1 * theta_result * (1 - theta_result)
+
+# TODO: remove!!!!
+random.seed(1)
+
 # Initialize an empty list to store the result
 input = []
 
@@ -83,13 +94,12 @@ with open('../training_data/ej3-digitos.txt', 'r') as file:
 if temp:
     input.append(temp)
 
-expected_output = [1, -1, 1, -1, 1, -1, 1, -1, 1, -1]
+expected_output = [[1, 0], [0, 1], [1, 0], [0, 1], [1, 0], [0, 1], [1, 0], [0, 1], [1, 0], [0, 1]]
 
 epsilon = 0.01
 limit = 100000
 i = 0
-p = MultiPerceptron(35, 2, 5, 1, lambda x: 1 if x >= 0 else -1, lambda x: 1,
-                    0.1)
+p = MultiPerceptron(35, 2, 5, 2, theta_logistic, theta_logistic_derivative, 0.25)
 
 error = None
 min_error = float("inf")
@@ -102,13 +112,13 @@ while min_error > epsilon and i < limit:
     error = p.compute_error(np.array(input), np.array(expected_output))
     if error < min_error:
         min_error = error
-        #
     i += 1
 
 print(min_error, i)
 
-for array in input:
-    print(p.forward_propagation(array))
+
+for array, output in zip(input, expected_output):
+    print(f"expected: {output}, generated: {p.forward_propagation(array)}")
 
 
 
