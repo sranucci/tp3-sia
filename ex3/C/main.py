@@ -1,8 +1,8 @@
 import time
-
 import pandas as pd
-import numpy as np
 from perceptrons.multi_perceptron import *
+
+random.seed(1)
 
 
 def main():
@@ -42,7 +42,8 @@ def main():
     print("starting training")
     error, w_min = neuronNetwork.train(0.35, 1000, pixel_arrays, expected_arrays, 1)
     end_time = time.time()
-    print(error, end_time - start_time)
+    print(f"error:{error}, time:{end_time - start_time}s", )
 
 
 main()
+

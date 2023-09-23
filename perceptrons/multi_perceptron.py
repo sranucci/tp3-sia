@@ -1,22 +1,30 @@
 import copy
 import math
+import sys
 from functools import partial
 
 import numpy as np
 import random
 
 
+# MAX_XB nos permite decidir si la funcion math.exp(-2 * x * beta) da overflow.
+# Resulta de resolver la inecuacion: math.exp(-2 * x * beta)  < MAX_FLOAT
+# No solo nos permite evitar el overflow, sino que tambien es mas eficiente dado
+# que en muchos casos evita hacer math.exp(...). Ej: para limit=100 pasa de 42 segundos
+# a 36 segundos.
+MAX_XB = math.floor(math.log(sys.float_info.max) / -2) + 2
+
+
 def theta_logistic(beta, x):
     # Evitamos el overflow
-    try:
-        a = 1 + math.exp(-2 * x * beta)
-    except OverflowError:
-        a = float("inf")
-    return 1 / a
+    if x < 0 and x * beta < MAX_XB:
+        return 0        # 1/inf = 0
+
+    return 1 / (1 + math.exp(-2 * x * beta))
 
 
 def theta_logistic_derivative(beta, x):
-    theta_result = theta_logistic(x, beta)
+    theta_result = theta_logistic(beta, x)
     return 2 * beta * theta_result * (1 - theta_result)
 
 
