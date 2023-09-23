@@ -37,7 +37,8 @@ class NeuronLayer:
 
     def compute_activation(self, prev_input):
 
-        self.excitement = np.dot(self.weights, prev_input)  # guardamos el dot producto dado que lo vamos a usar aca y en el backpropagation
+        self.excitement = np.dot(self.weights,
+                                 prev_input)  # guardamos el dot producto dado que lo vamos a usar aca y en el backpropagation
 
         self.output = self.activation_function(self.excitement)
 
@@ -138,23 +139,25 @@ class MultiPerceptron:
         if size < batch_rate:
             raise ValueError("Batch size is greater than size of input.")
 
+        # WIP!: problems with adding matrices
+
         i = 0
         error = None
         min_error = float("inf")
         w_min = None
         while min_error > epsilon and i < limit:
-            c = 0
+            c = None
             if batch_rate == size:  # entire input data in one batch
                 for idx, input in enumerate(input_data):
                     result = self.forward_propagation(input)
                     delta_w_matrix = self.back_propagation(expected_output[idx], result)
-                    c += delta_w_matrix
+                    c = self.add_to_c(c, delta_w_matrix)
             else:  # se eligen batch_rate random input values
                 for _ in range(batch_rate):
                     number = random.randint(0, size - 1)
                     result = self.forward_propagation(input_data[number])
                     delta_w_matrix = self.back_propagation(expected_output[number], result)
-                    c += delta_w_matrix
+                    c = self.add_to_c(c, delta_w_matrix)
 
             self.update_weights(c)
             error = self.compute_error(np.array(input_data), np.array(expected_output))
@@ -164,6 +167,13 @@ class MultiPerceptron:
             i += 1
 
         return error, w_min
+
+    def add_to_c(self, c, delta_w_matrix):
+        if c is None:
+            c = delta_w_matrix
+        else:
+            c += delta_w_matrix
+        return c
 
     def get_weights(self):
         weights = []

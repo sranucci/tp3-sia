@@ -39,15 +39,15 @@ def main():
             expected_output.append(arr)
 
     neuron_network = MultiPerceptron(
-                                     INPUT_SIZE,
-                                     config["hidden_layer_amount"],
-                                     config["neurons_per_layer"],
-                                     OUTPUT_SIZE,
-                                     theta_logistic,
-                                     theta_logistic_derivative,
-                                     config["hidden_layer_amount"],
-                                     config["activation_function"]["beta"]
-                                     )
+     INPUT_SIZE,
+     config["hidden_layer_amount"],
+     config["neurons_per_layer"],
+     OUTPUT_SIZE,
+     theta_logistic,
+     theta_logistic_derivative,
+     config["hidden_layer_amount"],
+     config["activation_function"]["beta"]
+     )
     error, w_min = neuron_network.train(config["epsilon"], config["limit"], input_data, expected_output)
 
 
