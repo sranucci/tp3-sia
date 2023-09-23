@@ -1,11 +1,11 @@
 {
-  "seed": -1,
+  "seed": 9999999,
   "training_data_input": "../../training_data/ej3-digitos.txt",
   "training_data_output": "../../training_data/ej3-respuestas.txt",
-  "learning_constant": 0.5,
-  "limit": 100000,
+  "learning_constant": 0.25,
+  "limit": 10000,
   "epsilon": 0.001,
-  "hidden_layer_amount": 3,
+  "hidden_layer_amount": 2,
   "neurons_per_layer": 5,
   "activation_function": {
     "type": "logistic_function",

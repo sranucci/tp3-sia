@@ -20,6 +20,14 @@ def theta_logistic_derivative(beta, x):
     return 2 * beta * theta_result * (1 - theta_result)
 
 
+def update_delta_w(delta_w, delta_w_matrix):
+    if delta_w is None:
+        delta_w = delta_w_matrix
+    else:
+        delta_w += delta_w_matrix
+    return delta_w
+
+
 class NeuronLayer:
     def __init__(self, previous_layer_neuron_amount, current_layer_neurons_amount, activation_function, lower_weight,
                  upper_weight):
@@ -37,12 +45,16 @@ class NeuronLayer:
 
     def compute_activation(self, prev_input):
 
-        self.excitement = np.dot(self.weights,
-                                 prev_input)  # guardamos el dot producto dado que lo vamos a usar aca y en el backpropagation
+        # guardamos el dot producto dado que lo vamos a usar aca y en el backpropagation
+        self.excitement = np.dot(self.weights,prev_input)
 
         self.output = self.activation_function(self.excitement)
 
         return self.output  # Se ejecuta la funcion sobre cada elemento del arreglo
+
+    def update_weights(self, delta_w):
+        # TODO: optimization
+        self.weights += delta_w
 
 
 class MultiPerceptron:
@@ -90,9 +102,9 @@ class MultiPerceptron:
 
         return current
 
-    def update_weights(self, delta_w):  # [matriz1,matriz2,matriz3]
+    def update_all_weights(self, delta_w):  # [matriz1,matriz2,matriz3]
         for idx, layer in enumerate(self.layers):
-            layer.weights += delta_w[idx]
+            layer.update_weights(delta_w[idx])
 
     def compute_error(self, data_input, expected_outputs):
 
@@ -139,27 +151,36 @@ class MultiPerceptron:
         if size < batch_rate:
             raise ValueError("Batch size is greater than size of input.")
 
-        # WIP!: problems with adding matrices
-
         i = 0
         error = None
-        min_error = float("inf")
         w_min = None
+        min_error = float("inf")
         while min_error > epsilon and i < limit:
-            c = None
-            if batch_rate == size:  # entire input data in one batch
+
+            delta_w = None # delta_w de todas las neuronas del sistema
+
+            # usamos todos los datos
+            if batch_rate == size:
                 for idx, input in enumerate(input_data):
+
                     result = self.forward_propagation(input)
                     delta_w_matrix = self.back_propagation(expected_output[idx], result)
-                    c = self.add_to_c(c, delta_w_matrix)
-            else:  # se eligen batch_rate random input values
+
+                    delta_w = update_delta_w(delta_w, delta_w_matrix)
+
+            # usamos un subconjunto
+            else:
                 for _ in range(batch_rate):
                     number = random.randint(0, size - 1)
+
                     result = self.forward_propagation(input_data[number])
                     delta_w_matrix = self.back_propagation(expected_output[number], result)
-                    c = self.add_to_c(c, delta_w_matrix)
 
-            self.update_weights(c)
+                    delta_w = update_delta_w(delta_w, delta_w_matrix)
+
+            # actualizamos los
+            self.update_all_weights(delta_w)
+
             error = self.compute_error(np.array(input_data), np.array(expected_output))
             if error < min_error:
                 min_error = error
@@ -167,13 +188,6 @@ class MultiPerceptron:
             i += 1
 
         return error, w_min
-
-    def add_to_c(self, c, delta_w_matrix):
-        if c is None:
-            c = delta_w_matrix
-        else:
-            c += delta_w_matrix
-        return c
 
     def get_weights(self):
         weights = []
