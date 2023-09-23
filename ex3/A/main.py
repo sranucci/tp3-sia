@@ -1,3 +1,5 @@
+import time
+
 from perceptrons.multi_perceptron import *
 import json
 
@@ -7,7 +9,7 @@ def main():
         config = json.load(file)
 
     input_data_xor = [[-1, 1], [1, -1], [-1, -1], [1, 1]]
-    expected_output = [1, 1, -1, -1]
+    expected_output = [1, 1, 0, 0]
 
     neuronNetwork = MultiPerceptron(2,
                                     config["hidden_layer_amount"],
@@ -19,8 +21,10 @@ def main():
                                     config["activation_function"]["beta"],
                                     )
 
-    neuronNetwork.train(0, config["limit"], input_data_xor, expected_output, config["batch_rate"])
-
+    start_time = time.time()
+    error, w_min = neuronNetwork.train(config["epsilon"], config["limit"], input_data_xor, expected_output, config["batch_rate"])
+    end_time = time.time()
+    print(error, end_time - start_time)
     print(neuronNetwork.forward_propagation([-1, 1]))
     print(neuronNetwork.forward_propagation([1, -1]))
     print(neuronNetwork.forward_propagation([1, 1]))

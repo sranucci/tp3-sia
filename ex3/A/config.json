@@ -2,11 +2,12 @@
   "seed": -1,
   "learning_constant": 0.2,
   "limit": 100000,
+  "epsilon": 0.001,
   "hidden_layer_amount": 2,
   "neurons_per_layer": 5,
   "activation_function": {
     "type": "logistic_function",
     "beta": 1
   },
-  "batch_rate": 2
+  "batch_rate": 1
 }
