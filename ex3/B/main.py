@@ -33,7 +33,10 @@ def main():
     with open(config["training_data_output"], 'r') as file:
         for line in file:
             numbers = line.strip().split()
-            expected_output.extend(map(int, numbers))
+            arr = []
+            for elem in numbers:
+                arr.append(int(elem))
+            expected_output.append(arr)
 
     neuron_network = MultiPerceptron(
                                      INPUT_SIZE,
@@ -49,3 +52,4 @@ def main():
 
 
 main()
+

@@ -1,11 +1,12 @@
 import copy
 import math
+from functools import partial
 
 import numpy as np
 import random
 
 
-def theta_logistic(x, beta):
+def theta_logistic(beta, x):
     # Evitamos el overflow
     try:
         a = 1 + math.exp(-2 * x * beta)
@@ -14,9 +15,9 @@ def theta_logistic(x, beta):
     return 1 / a
 
 
-def theta_logistic_derivative(x, beta):
+def theta_logistic_derivative(beta, x):
     theta_result = theta_logistic(x, beta)
-    return 2 * 1 * theta_result * (1 - theta_result)
+    return 2 * beta * theta_result * (1 - theta_result)
 
 
 class NeuronLayer:
@@ -44,6 +45,7 @@ class NeuronLayer:
 
 
 class MultiPerceptron:
+
     def __init__(self, num_entry_neurons, num_hidden_layers, neurons_per_layer, num_output_neurons, activation_function,
                  derivative_activation_function, learning_constant, beta):
 
@@ -56,7 +58,7 @@ class MultiPerceptron:
         upper_weight = math.log(1 / 0.98 - 1) / (-2 * beta)
         lower_weight = - upper_weight
 
-        activation_function = np.vectorize(lambda x: activation_function(x, beta))
+        activation_function = np.vectorize(partial(activation_function, beta))
 
         # Creamos la primera capa
         self.layers.append(
@@ -75,7 +77,7 @@ class MultiPerceptron:
         self.layers.append(
             NeuronLayer(neurons_per_layer, num_output_neurons, activation_function, lower_weight, upper_weight))
 
-        self.derivative_activation_function = np.vectorize(lambda x: derivative_activation_function(x, beta))
+        self.derivative_activation_function = np.vectorize(partial(derivative_activation_function, beta))
         self.learning_constant = learning_constant
         self.input = None
 
