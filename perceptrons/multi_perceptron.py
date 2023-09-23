@@ -14,11 +14,26 @@ import random
 # a 36 segundos.
 MAX_XB = math.floor(math.log(sys.float_info.max) / -2) + 2
 
+# MAX_X_RANGE permite evitar hacer el cálculo de math.exp(-2 * x * beta), en los
+# casos que sabemos que la respuesta va a dar o muy cercano a 1 o muy cercano a 0.
+# Resulta de resolver la ecuacion: 1 / (1 + math.exp(-2 * x * beta)) = 0.999
+# Tambien se usa que la funcion es impar.
+# Ej: para limit=100 pasa de 33.88 segundos a 28.74 segundos
+
+MAX_X_RANGE = math.log(1/0.999 - 1)
+
 
 def theta_logistic(beta, x):
     # Evitamos el overflow
     if x < 0 and x * beta < MAX_XB:
         return 0        # 1/inf = 0
+
+    # TODO: check si es seguro hacer esto
+    # Eficiencia: evitamos hacer el calculo si ya sabemos que tiende a 0 o 1
+    if x > MAX_X_RANGE / (-2 * beta):
+        return 0.999
+    elif x < MAX_X_RANGE / (2 * beta):
+        return 0.001
 
     return 1 / (1 + math.exp(-2 * x * beta))
 
@@ -34,6 +49,17 @@ def update_delta_w(delta_w, delta_w_matrix):
     else:
         delta_w += delta_w_matrix
     return delta_w
+
+
+def convert_data(data_input, data_output):
+    new_input = []
+    new_output = []
+
+    for i, o in zip(data_input, data_output):
+        new_input.append(np.array(i))
+        new_output.append(np.array(o))
+
+    return np.array(new_input), np.array(new_output)
 
 
 class NeuronLayer:
@@ -103,8 +129,8 @@ class MultiPerceptron:
         self.input = None
 
     def forward_propagation(self, input_data):
-        current = np.array(input_data)
-        self.input = current
+        current = input_data
+        self.input = input_data
         for layer in self.layers:
             current = layer.compute_activation(current)
 
@@ -118,9 +144,9 @@ class MultiPerceptron:
 
         error_vector = []
 
-        for idx, input in enumerate(data_input):
-            output_result = self.forward_propagation(input)
-            error_vector.append(np.power(expected_outputs[idx] - output_result, 2))
+        for i, o in zip(data_input, expected_outputs):
+            output_result = self.forward_propagation(i)
+            error_vector.append(np.power(o - output_result, 2))
 
         total = 0
         for elem in error_vector:
@@ -163,16 +189,20 @@ class MultiPerceptron:
         error = None
         w_min = None
         min_error = float("inf")
+
+        # Convertimos los datos de entrada a Numpy Array (asi no lo tenemos que hacer mientras procesamos)
+        converted_input, converted_output = convert_data(input_data, expected_output)
+
         while min_error > epsilon and i < limit:
 
             delta_w = None # delta_w de todas las neuronas del sistema
 
             # usamos todos los datos
             if batch_rate == size:
-                for idx, input in enumerate(input_data):
+                for i, o in zip(converted_input, converted_output):
 
-                    result = self.forward_propagation(input)
-                    delta_w_matrix = self.back_propagation(expected_output[idx], result)
+                    result = self.forward_propagation(i)
+                    delta_w_matrix = self.back_propagation(o, result)
 
                     delta_w = update_delta_w(delta_w, delta_w_matrix)
 
@@ -181,15 +211,15 @@ class MultiPerceptron:
                 for _ in range(batch_rate):
                     number = random.randint(0, size - 1)
 
-                    result = self.forward_propagation(input_data[number])
-                    delta_w_matrix = self.back_propagation(expected_output[number], result)
+                    result = self.forward_propagation(converted_input[number])
+                    delta_w_matrix = self.back_propagation(converted_output[number], result)
 
                     delta_w = update_delta_w(delta_w, delta_w_matrix)
 
             # actualizamos los
             self.update_all_weights(delta_w)
 
-            error = self.compute_error(np.array(input_data), np.array(expected_output))
+            error = self.compute_error(converted_input, converted_output)
             if error < min_error:
                 min_error = error
                 w_min = self.get_weights()
