@@ -1,6 +1,8 @@
 import json
 import time
 import pandas as pd
+
+from perceptrons.activation_functions import theta_logistic
 from perceptrons.multi_perceptron import *
 
 OUTPUT_SIZE = 10

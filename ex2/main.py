@@ -1,5 +1,7 @@
 import random
 
+from perceptrons.activation_functions import theta_tanh_derivative, theta_tanh, theta_logistic, \
+    theta_logistic_derivative
 from perceptrons.single_perceptron import *
 from linear_perceptron import *
 from non_linear_perceptron import *

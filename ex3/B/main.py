@@ -1,4 +1,6 @@
 import json
+
+from perceptrons.activation_functions import theta_logistic, theta_logistic_derivative
 from perceptrons.multi_perceptron import *
 
 INPUT_SIZE = 35

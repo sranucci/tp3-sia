@@ -1,5 +1,6 @@
 import time
 
+from perceptrons.activation_functions import theta_logistic, theta_logistic_derivative
 from perceptrons.multi_perceptron import *
 import json
 

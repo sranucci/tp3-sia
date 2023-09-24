@@ -1,6 +1,12 @@
 {
   "seed": 1,
   "training_data": "../../training_data/mnist_train.csv",
+  "selection_method": {
+    "total_size": 1000,
+    "type": "simple_selection",
+
+  },
+
 
   "learning_constant": 0.5,
   "limit": 100,

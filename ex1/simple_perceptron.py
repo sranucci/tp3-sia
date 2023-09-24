@@ -7,7 +7,7 @@ def update_weights_simple(learning_constant, activation, data_input, data_expect
 
 
 # Activation function
-def theta_simple(x, beta):
+def theta_simple(beta, x):
     return 1 if x >= 0 else -1
 
 

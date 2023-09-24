@@ -17,19 +17,19 @@ def convert_input(data_input):
 def initialize_weights(data_size):
     weights = []
     for _ in range(data_size):
-        weights.append(np.random.uniform(-10, 10))  # TODO check
+        weights.append(np.random.uniform(-2, 2))  # TODO check
     return np.array(weights)
 
 
 def generate_results(data_input, weights, theta, beta):
     generated_results = []
     for elem in data_input:
-        generated_results.append(theta(np.dot(elem, weights), beta))
+        generated_results.append(theta(beta, np.dot(elem, weights)))
     return generated_results
 
 
 def compute_activation(x_vector, weights, theta, beta):
-    return theta(np.dot(x_vector, weights), beta)
+    return theta(beta, np.dot(x_vector, weights))
 
 
 def perceptron(data_input, data_output, learning_constant, epsilon, update_weights, compute_error, theta,
