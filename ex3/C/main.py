@@ -2,7 +2,7 @@ import time
 import pandas as pd
 from perceptrons.multi_perceptron import *
 
-random.seed(1)
+# random.seed(1)
 
 
 def main():
@@ -26,8 +26,8 @@ def main():
     # Now, pixel_arrays contains the 784 pixel values for each image, and
     # expected_arrays contains the one-hot encoded expected values.
 
-    pixel_arrays = pixel_arrays[:-59000]
-    expected_arrays = expected_arrays[:-59000]
+    pixel_arrays = pixel_arrays[:10000]
+    expected_arrays = expected_arrays[:10000]
 
     neuronNetwork = MultiPerceptron(784,
                                     2,
@@ -40,7 +40,7 @@ def main():
 
     start_time = time.time()
     print("starting training")
-    error, w_min = neuronNetwork.train(0.35, 1000, pixel_arrays, expected_arrays, 1)
+    error, w_min = neuronNetwork.train(0.35, 100, 0.5, pixel_arrays, expected_arrays, 1)
     end_time = time.time()
     print(f"error:{error}, time:{end_time - start_time}s", )
 

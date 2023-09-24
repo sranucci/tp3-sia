@@ -77,6 +77,8 @@ class NeuronLayer:
                 weights[i].append(random.uniform(lower_weight, upper_weight))
         self.weights = np.array(weights)
 
+        self.prev_delta = 0
+
     def compute_activation(self, prev_input):
 
         # guardamos el dot producto dado que lo vamos a usar aca y en el backpropagation
@@ -86,9 +88,10 @@ class NeuronLayer:
 
         return self.output  # Se ejecuta la funcion sobre cada elemento del arreglo
 
-    def update_weights(self, delta_w):
-        # TODO: optimization
-        self.weights += delta_w
+    def update_weights(self, delta_w, alpha):
+        new_delta = delta_w + alpha * self.prev_delta
+        self.weights += new_delta
+        self.prev_delta = new_delta
 
 
 class MultiPerceptron:
@@ -136,9 +139,9 @@ class MultiPerceptron:
 
         return current
 
-    def update_all_weights(self, delta_w):  # [matriz1,matriz2,matriz3]
+    def update_all_weights(self, delta_w, alpha):  # [matriz1,matriz2,matriz3]
         for idx, layer in enumerate(self.layers):
-            layer.update_weights(delta_w[idx])
+            layer.update_weights(delta_w[idx], alpha)
 
     def compute_error(self, data_input, expected_outputs):
 
@@ -180,7 +183,7 @@ class MultiPerceptron:
 
         return delta_w
 
-    def train(self, epsilon, limit, input_data, expected_output, batch_rate=1):
+    def train(self, epsilon, limit, alpha, input_data, expected_output, batch_rate=1):
         size = len(input_data)
         if size < batch_rate:
             raise ValueError("Batch size is greater than size of input.")
@@ -217,7 +220,7 @@ class MultiPerceptron:
                     delta_w = update_delta_w(delta_w, delta_w_matrix)
 
             # actualizamos los
-            self.update_all_weights(delta_w)
+            self.update_all_weights(delta_w, alpha)
 
             error = self.compute_error(converted_input, converted_output)
             if error < min_error:

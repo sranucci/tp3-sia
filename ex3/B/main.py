@@ -48,7 +48,7 @@ def main():
      config["hidden_layer_amount"],
      config["activation_function"]["beta"]
      )
-    error, w_min = neuron_network.train(config["epsilon"], config["limit"], input_data, expected_output)
+    error, w_min = neuron_network.train(config["epsilon"], config["limit"], 0.5, input_data, expected_output)
     print(f"error: {error}")
 
     for input, output in zip(input_data, expected_output):
