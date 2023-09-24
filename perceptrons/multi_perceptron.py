@@ -294,9 +294,27 @@ class MultiPerceptron:
     def test(self, input_test_data, expected_output):
         true_positive = 0
         true_negative = 0
-        false_postive = 0
+        false_positive = 0
         false_negative = 0
-        for idx, input in enumerate(input_test_data):
-            result = self.forward_propagation(input)
-            if result == expected_output[idx]:
-                print("hola")
+        epsilon = 0.05
+        for input_data, outputs in zip(input_test_data, expected_output):
+            results = self.forward_propagation(input_data)
+            for result, expected_output in zip(results, outputs):
+                if expected_output == 1:
+                    if math.fabs(expected_output - result) < epsilon:
+                        #True positive
+                        true_positive += 1
+                    else:
+                        false_negative += 1
+                else:
+                    if math.fabs(expected_output - result) < epsilon:
+                        true_negative += 1
+                    else:
+                        false_positive += 1
+
+        accuracy = (true_positive + true_negative) / (true_positive + true_negative + false_positive + false_negative)
+        precision = true_positive / (true_positive + false_positive)
+        recall = true_positive / (true_positive+false_negative)
+        f1_score = (2 * precision * recall) / (precision + recall)
+
+        return accuracy, precision, recall, f1_score

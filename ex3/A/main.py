@@ -9,12 +9,12 @@ def main():
         config = json.load(file)
 
     input_data_xor = [[-1, 1], [1, -1], [-1, -1], [1, 1]]
-    expected_output = [1, 1, 0, 0]
+    expected_output = [[1, 0], [1, 0], [0, 1], [0, 1]]
 
     neuronNetwork = MultiPerceptron(2,
                                     config["hidden_layer_amount"],
                                     config["neurons_per_layer"],
-                                    1,
+                                    2,
                                     theta_logistic,
                                     theta_logistic_derivative,
                                     config["learning_constant"],
@@ -32,9 +32,12 @@ def main():
     )
     end_time = time.time()
     print(error, end_time - start_time)
-    print(neuronNetwork.forward_propagation([-1, 1]))
-    print(neuronNetwork.forward_propagation([1, -1]))
-    print(neuronNetwork.forward_propagation([1, 1]))
-    print(neuronNetwork.forward_propagation([-1, -1]))
+
+    accuracy, precision, recall, f1_score = neuronNetwork.test(input_data_xor, expected_output)
+    print(accuracy, precision, recall, f1_score)
+    # print(neuronNetwork.forward_propagation([-1, 1]))
+    # print(neuronNetwork.forward_propagation([1, -1]))
+    # print(neuronNetwork.forward_propagation([1, 1]))
+    # print(neuronNetwork.forward_propagation([-1, -1]))
 
 main()
