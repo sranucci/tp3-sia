@@ -47,13 +47,20 @@ def main():
      theta_logistic_derivative,
      config["hidden_layer_amount"],
      config["activation_function"]["beta"]
-     )
-    error, w_min = neuron_network.train(config["epsilon"], config["limit"], 0.5, input_data, expected_output)
+    )
+
+    error, w_min = neuron_network.train(
+        config["epsilon"],
+        config["limit"],
+        config["optimization_method"]["alpha"],
+        input_data,
+        expected_output,
+        config["batch_size"]
+    )
     print(f"error: {error}")
 
-    for input, output in zip(input_data, expected_output):
-        generated = neuron_network.forward_propagation(input)
-        print(f"generated: {generated}, expected: {output}")
+    accuracy, precision, recall, f1_score = neuron_network.test(input_data, expected_output)
+    print(accuracy, precision, recall, f1_score)
 
 
 main()
