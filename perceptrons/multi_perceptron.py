@@ -88,8 +88,11 @@ class NeuronLayer:
 
     def update_weights(self, delta_w):
         # TODO: optimization
+        #si estamos en gradient descent, no se pasa nada al parametro prev_delta_w
         self.weights += delta_w
 
+    def update_weights_with_optimization(self,delta_w,prev_delta_w):
+        self.weights += delta_w + 0.07 * prev_delta_w
 
 class MultiPerceptron:
 
@@ -136,9 +139,18 @@ class MultiPerceptron:
 
         return current
 
+
+    #le pasamos un segundo parametro si queremos usar la optimizacion
     def update_all_weights(self, delta_w):  # [matriz1,matriz2,matriz3]
         for idx, layer in enumerate(self.layers):
             layer.update_weights(delta_w[idx])
+
+    def update_all_weights_with_optimization(self,delta_w,prev_delta_w):
+        for idx, layer in enumerate(self.layers):
+            if prev_delta_w is None:
+                layer.update_weights(delta_w[idx])
+            else:
+                layer.update_weights_with_optimization(delta_w[idx],prev_delta_w[idx])
 
     def compute_error(self, data_input, expected_outputs):
 
@@ -226,6 +238,58 @@ class MultiPerceptron:
             i += 1
 
         return error, w_min
+
+
+    def train_with_optimization(self,epsilon, limit, input_data, expected_output, batch_rate = 1):
+        size = len(input_data)
+        if size < batch_rate:
+            raise ValueError("Batch size is greater than size of input.")
+
+        i = 0
+        error = None
+        w_min = None
+        prev_delta_w = None
+        min_error = float("inf")
+
+        # Convertimos los datos de entrada a Numpy Array (asi no lo tenemos que hacer mientras procesamos)
+        converted_input, converted_output = convert_data(input_data, expected_output)
+
+        while min_error > epsilon and i < limit:
+
+            delta_w = None # delta_w de todas las neuronas del sistema
+
+            # usamos todos los datos
+            if batch_rate == size:
+                for i, o in zip(converted_input, converted_output):
+
+                    result = self.forward_propagation(i)
+                    delta_w_matrix = self.back_propagation(o, result)
+
+                    delta_w = update_delta_w(delta_w, delta_w_matrix)
+
+            # usamos un subconjunto
+            else:
+                for _ in range(batch_rate):
+                    number = random.randint(0, size - 1)
+
+                    result = self.forward_propagation(converted_input[number])
+                    delta_w_matrix = self.back_propagation(converted_output[number], result)
+
+                    delta_w = update_delta_w(delta_w, delta_w_matrix)
+
+            # actualizamos los
+            self.update_all_weights_with_optimization(delta_w, prev_delta_w)
+
+            error = self.compute_error(converted_input, converted_output)
+            if error < min_error:
+                min_error = error
+                w_min = self.get_weights()
+            i += 1
+            prev_delta_w = delta_w
+
+        return error, w_min
+
+
 
     def get_weights(self):
         weights = []
