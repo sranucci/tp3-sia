@@ -1,7 +1,10 @@
 import copy
 import math
 import sys
+import time
 from functools import partial
+from multiprocessing import Pool
+from multiprocessing.pool import ThreadPool
 
 import numpy as np
 import random
@@ -62,6 +65,21 @@ def convert_data(data_input, data_output):
     return np.array(new_input), np.array(new_output)
 
 
+def compute_error_single(data):
+
+    # Esta funcion combina los metodos compute_error de MultiPerceptron y
+    # compute_activation de NueronLayer. Esta disenado para ser usado
+    # de forma paralela (como en compute_error_parallel).
+
+    weights, activation_function, data_input, expected_output = data[0], data[1], data[2], data[3]
+
+    current = data_input
+    for weight in weights:
+        current = activation_function(np.dot(weight, current))
+
+    return np.power(expected_output - current, 2)
+
+
 class NeuronLayer:
     def __init__(self, previous_layer_neuron_amount, current_layer_neurons_amount, activation_function, lower_weight,
                  upper_weight):
@@ -82,7 +100,7 @@ class NeuronLayer:
     def compute_activation(self, prev_input):
 
         # guardamos el dot producto dado que lo vamos a usar aca y en el backpropagation
-        self.excitement = np.dot(self.weights,prev_input)
+        self.excitement = np.dot(self.weights, prev_input)
 
         self.output = self.activation_function(self.excitement)
 
@@ -109,6 +127,7 @@ class MultiPerceptron:
         lower_weight = - upper_weight
 
         activation_function = np.vectorize(partial(activation_function, beta))
+        self.activation_function = activation_function
 
         # Creamos la primera capa
         self.layers.append(
@@ -130,6 +149,9 @@ class MultiPerceptron:
         self.derivative_activation_function = np.vectorize(partial(derivative_activation_function, beta))
         self.learning_constant = learning_constant
         self.input = None
+
+        # Variables usadas en compute_error_parallel
+        self.error_calc_items = None
 
     def forward_propagation(self, input_data):
         current = input_data
@@ -154,6 +176,37 @@ class MultiPerceptron:
         total = 0
         for elem in error_vector:
             total += sum(elem)
+
+        return 0.5 * total
+
+    def compute_error_parallel(self, data_input, expected_outputs):
+
+        # Este metodo permite calcular el error de forma paralela.
+        # MG: de lo que tengo entendido, es la unica parte del metodo train
+        # que se puede paralelizar.
+        # Se uso ThreadPool que usa threads en vez de Pool que usa procesos porque
+        # es demasiado caro generar nuevos procesos y termina siendo mucho peor.
+        # Performance: pasa de 2.8s para procesar 10000 elementos a 2.1s.
+
+        weights = self.get_weights()
+
+        if self.error_calc_items is None:
+            self.error_calc_items = []
+            for i, o in zip(data_input, expected_outputs):
+                # Usamos todas referencias asi no hay que re generar el arreglo de items.
+                self.error_calc_items.append([weights, self.activation_function, i, o])
+        else:
+            # Updateamos las referencias a los nuevos pesos
+            # No encontre mejor manera para hacer esto :(
+            for i in range(len(self.error_calc_items)):
+                self.error_calc_items[i][0] = weights
+
+        total = 0
+        with ThreadPool() as pool:
+            results = pool.imap_unordered(compute_error_single, self.error_calc_items)
+
+            for elem in results:
+                total += sum(elem)
 
         return 0.5 * total
 
@@ -219,10 +272,12 @@ class MultiPerceptron:
 
                     delta_w = update_delta_w(delta_w, delta_w_matrix)
 
-            # actualizamos los
+            # Actualizamos los pesos
             self.update_all_weights(delta_w, alpha)
 
-            error = self.compute_error(converted_input, converted_output)
+            # Calculamos el error de la red neuronal
+            error = self.compute_error_parallel(converted_input, converted_output)
+
             if error < min_error:
                 min_error = error
                 w_min = self.get_weights()
