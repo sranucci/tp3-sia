@@ -22,7 +22,14 @@ def main():
                                     )
 
     start_time = time.time()
-    error, w_min = neuronNetwork.train(config["epsilon"], config["limit"], input_data_xor, expected_output, config["batch_rate"])
+    error, w_min = neuronNetwork.train(
+        config["epsilon"],
+        config["limit"],
+        config["optimization_method"]["alpha"],
+        input_data_xor,
+        expected_output,
+        config["batch_size"]
+    )
     end_time = time.time()
     print(error, end_time - start_time)
     print(neuronNetwork.forward_propagation([-1, 1]))

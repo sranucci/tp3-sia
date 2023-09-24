@@ -1,13 +1,14 @@
 {
-  "seed": -1,
-  "learning_constant": 0.2,
+  "seed": 1,
+  "training_data": "../../training_data/mnist_train.csv",
 
-  "limit": 100000,
-  "epsilon": 0.001,
+  "learning_constant": 0.5,
+  "limit": 100,
+  "epsilon": 300,
   "batch_size": 1,
 
   "hidden_layer_amount": 2,
-  "neurons_per_layer": 5,
+  "neurons_per_layer": 16,
 
   "activation_function": {
     "type": "logistic_function",

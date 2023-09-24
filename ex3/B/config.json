@@ -2,13 +2,21 @@
   "seed": -1,
   "training_data_input": "../../training_data/ej3-digitos.txt",
   "training_data_output": "../../training_data/ej3-respuestas.txt",
+
   "learning_constant": 0.5,
   "limit": 10000,
   "epsilon": 0.001,
+  "batch_size": 1,
+
   "hidden_layer_amount": 1,
   "neurons_per_layer": 3,
+
   "activation_function": {
     "type": "logistic_function",
     "beta": 1
+  },
+  "optimization_method": {
+    "type": "momentum",
+    "alpha": 0.5
   }
 }
