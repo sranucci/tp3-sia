@@ -49,7 +49,7 @@ def main():
      config["activation_function"]["beta"]
     )
 
-    error, w_min = neuron_network.train(
+    error, w_min, metrics = neuron_network.train(
         config["epsilon"],
         config["limit"],
         config["optimization_method"]["alpha"],

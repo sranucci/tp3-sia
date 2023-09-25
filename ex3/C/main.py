@@ -42,7 +42,7 @@ def main():
 
     start_time = time.time()
     print("starting training")
-    error, w_min = neuronNetwork.train(
+    error, w_min, metrics  = neuronNetwork.train(
         config["epsilon"],
         config["limit"],
         config["optimization_method"]["alpha"],
