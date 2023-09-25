@@ -1,11 +1,11 @@
 {
-  "seed": -1,
+  "seed": 1,
   "training_data": "../training_data/ex2.csv",
-  "learning_constant": 0.5,
+  "learning_constant": 0.005,
   "limit": 100000,
   "epsilon": 1000,
   "method": {
-    "type": "non_linear",
+    "type": "linear",
     "theta": "logistic",
     "beta": 0.3
   },

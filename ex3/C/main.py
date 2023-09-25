@@ -2,9 +2,10 @@ import json
 import time
 import pandas as pd
 from perceptrons.multi_perceptron import *
+from perceptrons.selection_methods import simple_selection
 
 OUTPUT_SIZE = 10
-INPUT_SIZE = 784
+INPUT_SIZE = 35
 
 
 def main():
@@ -14,22 +15,34 @@ def main():
     if config["seed"] != -1:
         random.seed(config["seed"])
 
-    data = pd.read_csv('../../training_data/mnist_train.csv')
+    # Levantamos el input
+    input_data = []
+    with open(config["training_data_input"], 'r') as file:
+        temp = []
+        for line in file:
+            numbers = line.strip().split()
 
-    labels = data['label'].values
-    pixels = data.drop('label', axis=1).values
+            temp.extend(map(int, numbers))
 
-    one_hot_labels = np.zeros((len(labels), OUTPUT_SIZE))
-    for i in range(len(labels)):
-        one_hot_labels[i, labels[i]] = 1
+            if len(temp) == INPUT_SIZE:
+                input_data.append(temp)
+                temp = []
 
-    pixel_arrays = np.array(pixels)
-    expected_arrays = np.array(one_hot_labels)
+    if temp:
+        input_data.append(temp)
 
-    pixel_arrays = pixel_arrays[:1000]
-    expected_arrays = expected_arrays[:1000]
+    # Levantamos el output
+    expected_output = []
+    with open(config["training_data_output"], 'r') as file:
+        for line in file:
+            numbers = line.strip().split()
+            arr = []
+            for elem in numbers:
+                arr.append(int(elem))
+            expected_output.append(arr)
 
-    neuronNetwork = MultiPerceptron(
+
+    neural_network = MultiPerceptron(
         INPUT_SIZE,
         config["hidden_layer_amount"],
         config["neurons_per_layer"],
@@ -37,22 +50,26 @@ def main():
         theta_logistic,
         theta_logistic_derivative,
         config["hidden_layer_amount"],
-        config["activation_function"]["beta"],
-        )
+        config["activation_function_beta"],
+    )
 
     start_time = time.time()
-    print("starting training")
-    error, w_min, metrics  = neuronNetwork.train(
+    error, w_min, metrics = neural_network.train(
         config["epsilon"],
         config["limit"],
         config["optimization_method"]["alpha"],
-        pixel_arrays,
-        expected_arrays,
+        np.array(input_data),
+        np.array(expected_output),
         collect_metrics,
         config["batch_size"]
     )
     end_time = time.time()
-    print(f"error:{error}, time:{end_time - start_time}s", )
+
+    print(f"Training complete! \nError:{error}, Time elapsed:{end_time - start_time}s", )
+
+    accuracy, precision, recall, f1_score = neural_network.test(np.array(input_data), np.array(expected_output))
+
+    print(f"Accuracy: {accuracy}, Precision: {precision}, Recall: {recall}, F1 Score: {f1_score}")
 
 
 def collect_metrics(metrics, error, iteration):

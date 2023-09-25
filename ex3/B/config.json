@@ -1,7 +1,7 @@
 {
   "seed": -1,
   "training_data_input": "../../training_data/ej3-digitos.txt",
-  "training_data_output": "../../training_data/ej3-respuestas.txt",
+  "training_data_output": "../../training_data/ej3-B-respuestas.txt",
 
   "learning_constant": 0.5,
   "limit": 10000,

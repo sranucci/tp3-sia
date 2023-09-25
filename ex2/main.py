@@ -4,7 +4,7 @@ from perceptrons.single_perceptron import *
 from linear_perceptron import *
 from non_linear_perceptron import *
 import csv
-from selection_methods import *
+from perceptrons.selection_methods import *
 
 
 def collect_metrics(metrics, weights, error, iterations):
