@@ -2,8 +2,8 @@
   "seed": -1,
   "learning_constant": 0.2,
 
-  "limit": 100000,
-  "epsilon": 0.001,
+  "limit": 10000,
+  "epsilon": 0.001 ,
   "batch_size": 1,
 
   "hidden_layer_amount": 2,
@@ -16,5 +16,7 @@
   "optimization_method": {
     "type": "momentum",
     "alpha": 0.5
-  }
+  },
+  "generate_error_graph": false,
+  "print_final_values": true
 }

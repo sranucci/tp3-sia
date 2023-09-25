@@ -236,7 +236,7 @@ class MultiPerceptron:
 
         return delta_w
 
-    def train(self, epsilon, limit, alpha, input_data, expected_output, batch_rate=1):
+    def train(self, epsilon, limit, alpha, input_data, expected_output, collect_metrics, batch_rate=1):
         size = len(input_data)
         if size < batch_rate:
             raise ValueError("Batch size is greater than size of input.")
@@ -245,6 +245,8 @@ class MultiPerceptron:
         error = None
         w_min = None
         min_error = float("inf")
+        metrics = {}
+        self.initialize_metrics(metrics)
 
         # Convertimos los datos de entrada a Numpy Array (asi no lo tenemos que hacer mientras procesamos)
         converted_input, converted_output = convert_data(input_data, expected_output)
@@ -282,8 +284,9 @@ class MultiPerceptron:
                 min_error = error
                 w_min = self.get_weights()
             i += 1
+            collect_metrics(metrics, error, i)
 
-        return error, w_min
+        return error, w_min, metrics
 
     def get_weights(self):
         weights = []
@@ -318,3 +321,8 @@ class MultiPerceptron:
         f1_score = (2 * precision * recall) / (precision + recall)
 
         return accuracy, precision, recall, f1_score
+
+    @staticmethod
+    def initialize_metrics(metrics):
+        metrics["error"] = []
+        metrics["iteration"] = 0

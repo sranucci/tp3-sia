@@ -48,11 +48,15 @@ def main():
         config["optimization_method"]["alpha"],
         pixel_arrays,
         expected_arrays,
+        collect_metrics,
         config["batch_size"]
     )
     end_time = time.time()
     print(f"error:{error}, time:{end_time - start_time}s", )
 
+
+def collect_metrics(metrics, error, iteration):
+    pass
 
 main()
 

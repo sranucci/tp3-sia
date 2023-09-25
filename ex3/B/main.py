@@ -55,12 +55,17 @@ def main():
         config["optimization_method"]["alpha"],
         input_data,
         expected_output,
+        collect_metrics,
         config["batch_size"]
     )
     print(f"error: {error}")
 
     accuracy, precision, recall, f1_score = neuron_network.test(input_data, expected_output)
     print(accuracy, precision, recall, f1_score)
+
+
+def collect_metrics(metrics, error, iteration):
+    pass
 
 
 main()
