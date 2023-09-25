@@ -1,11 +1,34 @@
 import json
-import time
-import pandas as pd
+from datetime import datetime
 from perceptrons.multi_perceptron import *
-from perceptrons.selection_methods import simple_selection
+
 
 OUTPUT_SIZE = 10
 INPUT_SIZE = 35
+
+
+def collect_metrics(metrics, error, iteration):
+    metrics["error"].append(error)
+    metrics["iterations"] = iteration
+
+
+def export_metrics(metrics):
+    now = datetime.now().strftime("%d-%m-%Y_%H%M%S")
+
+    # Exporto las metricas
+    with open(f"./results/results_{now}.json", mode="w+") as file:
+        file.write(json.dumps(metrics, indent=4))
+
+
+def apply_noise(inputs, max_noise):
+    altered_inputs = []
+    for number in inputs:
+        altered = copy.deepcopy(number)
+        for i in range(len(altered)):
+            altered[i] = min(altered[i] + random.uniform(0, max_noise), 1)
+        altered_inputs.append(altered)
+
+    return altered_inputs
 
 
 def main():
@@ -41,7 +64,6 @@ def main():
                 arr.append(int(elem))
             expected_output.append(arr)
 
-
     neural_network = MultiPerceptron(
         INPUT_SIZE,
         config["hidden_layer_amount"],
@@ -65,15 +87,20 @@ def main():
     )
     end_time = time.time()
 
-    print(f"Training complete! \nError:{error}, Time elapsed:{end_time - start_time}s", )
+    metrics["training error"] = error
+    metrics["time elapsed"] = end_time - start_time
 
-    accuracy, precision, recall, f1_score = neural_network.test(np.array(input_data), np.array(expected_output))
+    export_metrics(metrics)
 
-    print(f"Accuracy: {accuracy}, Precision: {precision}, Recall: {recall}, F1 Score: {f1_score}")
+    accuracy, precision, recall, f1_score = neural_network.test(np.array(input_data), np.array(expected_output), 0.05)
+
+    metrics["accuracy"] = accuracy
+    metrics["precision"] = precision
+    metrics["recall"] = recall
+    metrics["f1 Score"] = f1_score
 
 
-def collect_metrics(metrics, error, iteration):
-    pass
+
 
 main()
 

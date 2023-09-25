@@ -297,18 +297,16 @@ class MultiPerceptron:
             weights.append(copy.deepcopy(layer.weights))
         return weights
 
-    def test(self, input_test_data, expected_output):
+    def test(self, input_test_data, expected_output, epsilon=0.05):
         true_positive = 0
         true_negative = 0
         false_positive = 0
         false_negative = 0
-        epsilon = 0.05
         for input_data, outputs in zip(input_test_data, expected_output):
             results = self.forward_propagation(input_data)
             for result, expected_output in zip(results, outputs):
                 if expected_output == 1:
                     if math.fabs(expected_output - result) < epsilon:
-                        #True positive
                         true_positive += 1
                     else:
                         false_negative += 1
