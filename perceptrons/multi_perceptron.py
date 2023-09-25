@@ -278,7 +278,10 @@ class MultiPerceptron:
             self.update_all_weights(delta_w, alpha)
 
             # Calculamos el error de la red neuronal
-            error = self.compute_error_parallel(converted_input, converted_output)
+            if len(converted_input) < 1000:
+                error = self.compute_error(converted_input, converted_output)
+            else:
+                error = self.compute_error_parallel(converted_input, converted_output)
 
             if error < min_error:
                 min_error = error
