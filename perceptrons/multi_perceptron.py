@@ -318,7 +318,9 @@ class MultiPerceptron:
         accuracy = (true_positive + true_negative) / (true_positive + true_negative + false_positive + false_negative)
         precision = true_positive / (true_positive + false_positive)
         recall = true_positive / (true_positive+false_negative)
-        f1_score = (2 * precision * recall) / (precision + recall)
+        f1_score = None
+        if precision + recall != 0:
+            f1_score = (2 * precision * recall) / (precision + recall)
 
         return accuracy, precision, recall, f1_score
 
