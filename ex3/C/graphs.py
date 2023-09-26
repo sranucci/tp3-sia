@@ -57,46 +57,39 @@ def graph_mse_values(mse_values):
     # Show the plot
     fig.show()
 
-def graph_test_results(test_results):
-    # Create subplots
+def graph_test_metrics(test_metrics):
+    # Create a DataFrame
+    # Define noise levels (replace with your noise levels)
+    noise_levels = [i * 0.1 for i in range(len(test_metrics))]
+
+    # Define metric names
+    metrics = ['Accuracy', 'Precision', 'Recall', 'F1 Score']
+
+    # Create a DataFrame
+    df = pd.DataFrame(test_metrics, columns=metrics)
+    df['Noise Level'] = noise_levels
+
+    # Create a grouped bar chart
     fig = go.Figure()
-    neuron_configurations = [10, 11, 12, 13, 14]
-    accuracy_values = []
-    precision_values = []
-    recall_values = []
-    f1_score_values = []
 
-    for elem in test_results:
-        accuracy_values.append(elem[0])
-        precision_values.append(elem[1])
-        recall_values.append(elem[2])
-        f1_score_values.append(elem[3])
-
-    performance_metrics = {
-        'Accuracy': accuracy_values,
-        'Precision': precision_values,
-        'Recall': recall_values,
-        'F1 Score': f1_score_values,
-    }
-
-    # Create a separate bar chart for each performance metric
-    for metric_name, metric_values in performance_metrics.items():
-        fig = go.Figure()
-
+    for metric in metrics:
         fig.add_trace(go.Bar(
-            x=neuron_configurations,
-            y=metric_values,
-            name=metric_name,
-            marker_color='blue'  # You can customize the color here
+            x=df['Noise Level'],
+            y=df[metric],
+            name=metric
         ))
 
-        fig.update_layout(
-            title=f'{metric_name} for Different Configurations',
-            xaxis=dict(title='Neurons per Layer'),
-            yaxis=dict(title=metric_name),
-        )
+    # Customize the layout
+    fig.update_layout(
+        barmode='group',
+        xaxis_title='Max Noise',
+        yaxis_title='Score',
+        title='Metrics vs. Max Noise',
+        legend_title='Metrics'
+    )
 
-        fig.show()
+    # Show the plot
+    fig.show()
 
 
 def collect_metrics(metrics, error, error_test, iteration):
@@ -126,8 +119,6 @@ def average_train(data):
             config["optimization_method"]["alpha"],
             np.array(train_input),
             np.array(train_output),
-            np.array(test_input),
-            np.array(test_output),
             collect_metrics,
             config["batch_size"]
         )
@@ -156,7 +147,7 @@ def average_train(data):
 
 
 def average_test(data):
-    config, input_data, expected_ouput, test_data = data[0], data[1], data[2], data[3]
+    config, input_data, expected_ouput, test_data, test_output = data[0], data[1], data[2], data[3], data[4]
     test_results = np.zeros(4)
 
     NUM_ITERATIONS = 10
@@ -183,7 +174,7 @@ def average_test(data):
             config["batch_size"]
         )
 
-        accuracy, precision, recall, f1_score = neural_network.test(test_data, expected_ouput)
+        accuracy, precision, recall, f1_score = neural_network.test(test_data, test_output)
 
         test_results[0] += accuracy
         test_results[1] += precision
@@ -304,24 +295,39 @@ def average_test_parallel():
                 arr.append(int(elem))
             expected_output.append(arr)
 
-    test_data = apply_noise(input_data, 0.01)
+    # combined = []
+    # for i, o in zip(input_data, expected_output):
+    #     combined.append([i, o])
+    #
+    # random.shuffle(combined)
+    # input_data.clear()
+    # expected_output.clear()
+    #
+    # for i, o in combined:
+    #     input_data.append(i)
+    #     expected_output.append(o)
 
-    scores_per_change = []
+    TRAIN = 7
 
+    train_input = input_data
+    test_input = input_data
+
+    train_output = expected_output
+    test_output = expected_output
+
+    scores = []
     data = []
-    for i in range(6):
-        new_config = copy.deepcopy(config)
-        new_config["neurons_per_layer"] += i
-        data.append([new_config, input_data, expected_output, test_data])
+    for i in range(4):
+        data.append([config, train_input, train_output, apply_noise(test_input, 0.1 * i), test_output])
 
     with Pool(processes=5) as pool:
-        results = pool.imap_unordered(average_test, data)
+        results = pool.map(average_test, data)
 
         for elem in results:
-            scores_per_change.append(elem)
+            scores.append(elem)
 
-    graph_test_results(scores_per_change)
+    graph_test_metrics(scores)
 
 
 if __name__ == "__main__":
-    average_train_parallel()
+    average_test_parallel()

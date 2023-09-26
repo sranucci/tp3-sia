@@ -236,7 +236,7 @@ class MultiPerceptron:
 
         return delta_w
 
-    def train(self, epsilon, limit, alpha, input_data, expected_output, test_input, test_output, collect_metrics, batch_rate=1):
+    def train(self, epsilon, limit, alpha, input_data, expected_output, collect_metrics, batch_rate=1):
         size = len(input_data)
         if size < batch_rate:
             raise ValueError("Batch size is greater than size of input.")
@@ -283,13 +283,11 @@ class MultiPerceptron:
             else:
                 error = self.compute_error_parallel(converted_input, converted_output)
 
-            error_test = self.compute_error(test_input, test_output)
-
             if error < min_error:
                 min_error = error
                 w_min = self.get_weights()
             i += 1
-            collect_metrics(metrics, error * 2 / len(converted_input), error_test * 2 / len(test_input), i)
+            collect_metrics(metrics, error * 2 / len(converted_input), 0, i)
 
         return error, w_min, metrics
 
