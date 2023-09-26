@@ -12,7 +12,7 @@
 
   "learning_constant": 0.05,
   "limit": 600,
-  "epsilon": 0,
+  "epsilon": 0.001,
   "batch_size": 1,
 
   "hidden_layer_amount": 1,

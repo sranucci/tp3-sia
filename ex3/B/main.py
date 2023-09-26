@@ -39,28 +39,37 @@ def main():
                 arr.append(int(elem))
             expected_output.append(arr)
 
-    train_input, train_expected_output, test_input, test_expected_output, test_number_value = separate_train_test(input_data, expected_output)
+    train_input, train_expected_output, test_input, test_expected_output, test_number_value = separate_train_test(
+        input_data, expected_output)
 
-    neuron_network = MultiPerceptron(
-     INPUT_SIZE,
-     config["hidden_layer_amount"],
-     config["neurons_per_layer"],
-     OUTPUT_SIZE,
-     theta_logistic,
-     theta_logistic_derivative,
-     config["hidden_layer_amount"],
-     config["activation_function"]["beta"]
-    )
+    f = open("./results.csv","w")
+    i = 0
+    while i <= 1:
+        neuron_network = MultiPerceptron(
+            INPUT_SIZE,
+            config["hidden_layer_amount"],
+            config["neurons_per_layer"],
+            OUTPUT_SIZE,
+            theta_logistic,
+            theta_logistic_derivative,
+            config["hidden_layer_amount"],
+            config["activation_function"]["beta"]
+        )
 
-    error, w_min, metrics = neuron_network.train(
-        config["epsilon"],
-        config["limit"],
-        config["optimization_method"]["alpha"],
-        train_input,
-        train_expected_output,
-        collect_metrics,
-        config["batch_size"]
-    )
+        error, w_min, metrics = neuron_network.train(
+            config["epsilon"],
+            config["limit"],
+            i,
+            train_input,
+            train_expected_output,
+            collect_metrics,
+            config["batch_size"]
+        )
+
+        print(f"{i:.2f},{error}",file=f)
+        print(i)
+        i += 0.01
+    f.close()
 
     if config["print_results"]:
         print(f"error: {error}")
@@ -97,7 +106,6 @@ def main():
 
         # Show the plot
         fig.show()
-
 
 
 def collect_metrics(metrics, error, iteration):

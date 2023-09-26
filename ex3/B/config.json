@@ -4,7 +4,7 @@
   "training_data_output": "../../training_data/ej3-B-respuestas.txt",
 
   "learning_constant": 0.5,
-  "limit": 10000,
+  "limit": 100000,
   "epsilon": 0.001,
   "batch_size": 1,
 

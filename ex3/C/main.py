@@ -76,15 +76,36 @@ def main():
     )
 
     start_time = time.time()
-    error, w_min, metrics = neural_network.train(
-        config["epsilon"],
-        config["limit"],
-        config["optimization_method"]["alpha"],
-        np.array(input_data),
-        np.array(expected_output),
-        collect_metrics,
-        config["batch_size"]
-    )
+
+    file = open("./results.csv","w")
+
+    i = 0
+    while i <= 1:
+        neural_network = MultiPerceptron(
+            INPUT_SIZE,
+            config["hidden_layer_amount"],
+            config["neurons_per_layer"],
+            OUTPUT_SIZE,
+            theta_logistic,
+            theta_logistic_derivative,
+            config["hidden_layer_amount"],
+            config["activation_function_beta"],
+            )
+
+        error, w_min, metrics = neural_network.train(
+            config["epsilon"],
+            config["limit"],
+            i,
+            np.array(input_data),
+            np.array(expected_output),
+            collect_metrics,
+            config["batch_size"]
+        )
+        print(f"{i:.2f},{error}",file=file)
+        print(i)
+        i += 0.01
+
+    file.close()
     end_time = time.time()
 
     metrics["training error"] = error

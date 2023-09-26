@@ -3,7 +3,7 @@ from matplotlib.animation import FuncAnimation
 import numpy as np
 import csv
 
-with open("../../results/optimization_results/results.csv","r") as f:
+with open("./results.csv","r") as f:
     reader = csv.reader(f)
     data_x = []
     data_y = []

@@ -2,7 +2,7 @@
   "seed": -1,
   "learning_constant": 0.2,
 
-  "limit": 10000,
+  "limit": 100000,
   "epsilon": 0.001 ,
   "batch_size": 1,
 

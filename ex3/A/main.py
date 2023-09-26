@@ -14,28 +14,37 @@ def main():
     input_data_xor = [[-1, 1], [1, -1], [-1, -1], [1, 1]]
     expected_output = [[1, 0], [1, 0], [0, 1], [0, 1]]
 
-    neuronNetwork = MultiPerceptron(2,
-                                    config["hidden_layer_amount"],
-                                    config["neurons_per_layer"],
-                                    2,
-                                    theta_logistic,
-                                    theta_logistic_derivative,
-                                    config["learning_constant"],
-                                    config["activation_function"]["beta"],
-                                    )
 
-    start_time = time.time()
-    error, w_min, metrics = neuronNetwork.train(
-        config["epsilon"],
-        config["limit"],
-        config["optimization_method"]["alpha"],
-        input_data_xor,
-        expected_output,
-        collect_metrics,
-        config["batch_size"]
-    )
-    end_time = time.time()
-    print(error, end_time - start_time)
+
+    file = open("./results2.csv","w")
+
+
+    i = 0
+    while i <= 1:
+        neuronNetwork = MultiPerceptron(2,
+                                        config["hidden_layer_amount"],
+                                        config["neurons_per_layer"],
+                                        2,
+                                        theta_logistic,
+                                        theta_logistic_derivative,
+                                        config["learning_constant"],
+                                        config["activation_function"]["beta"],
+                                        )
+        error, w_min, metrics = neuronNetwork.train(
+            config["epsilon"],
+            config["limit"],
+            i,
+            input_data_xor,
+            expected_output,
+            collect_metrics,
+            config["batch_size"]
+        )
+        print(f"{i:.2f},{error}", file=file)
+        print(i)
+        i += 0.01
+
+    file.close()
+
 
     if config["print_final_values"]:
         for input_data, output in zip(input_data_xor, expected_output):
