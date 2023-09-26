@@ -34,9 +34,9 @@ def compute_activation(x_vector, weights, theta, beta):
 
 def perceptron(data_input, data_output, learning_constant, epsilon, update_weights, compute_error, theta,
                collect_metrics, limit=100000, beta=1, theta_derivative=None):
-    data_size = len(data_input[0])
+    data_size = len(data_input)
     iterations = 0
-    weights = initialize_weights(data_size + 1)  # tenemos el w0 tambien
+    weights = initialize_weights(len(data_input[0])+1)  # tenemos el w0 tambien
     min_error = float("inf")
     w_min = []
     metrics = {}
