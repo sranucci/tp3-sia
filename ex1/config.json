@@ -1,0 +1,26 @@
+{
+  "input_data": [[-1, 1], [1, -1], [1, 1], [-1, -1]],
+  "and": {
+    "run_and":false,
+    "expected_output_and": [-1, -1, 1, -1],
+    "learning_constant": 0.1,
+    "limit": 100,
+    "print_wmin": true,
+    "generate_gif": true
+  },
+  "xor": {
+    "run_xor":false,
+    "expected_output_xor": [1, 1, -1, -1],
+    "learning_constant": 0.35,
+    "limit": 40,
+    "print_wmin": true,
+    "generate_gif": true
+  },
+  "average": {
+    "run_average": true,
+    "number_of_runs": 100,
+    "learning_constant": 0.35,
+    "limit": 15,
+    "run_and_data_set": false
+  }
+}

@@ -7,10 +7,10 @@ import json
 
 def animate_lines(input_data, gif_name, file_name=None):
     if file_name is None:
-        path = "../results"
+        path = "./results"
         files = os.listdir(path)
         files.sort()
-        file_name = f"{path}/{files[-2]}"
+        file_name = f"{path}/{files[-1]}"
 
     with open(file_name) as file:
         results = json.load(file)
