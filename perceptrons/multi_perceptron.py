@@ -297,6 +297,34 @@ class MultiPerceptron:
             weights.append(copy.deepcopy(layer.weights))
         return weights
 
+    def confusion_matrix(self, input_test_data, expected_output, epsilon=0.05):
+        confusion_matrix = []
+        for i in range(len(expected_output)):
+            line = []
+            for j in range(len(expected_output)):
+                line.append(np.array([0, 0, 0, 0]))
+            confusion_matrix.append(np.array(line))
+
+        i=0
+        for input_data, outputs in zip(input_test_data, expected_output):
+            results = self.forward_propagation(input_data)
+            j=0
+            for result, expected_output in zip(results, outputs):
+                if expected_output == 1:
+                    if math.fabs(expected_output - result) < epsilon:
+                        confusion_matrix[i][j][0] += 1
+                    else:
+                        confusion_matrix[i][j][1] += 1
+                else:
+                    if math.fabs(expected_output - result) < epsilon:
+                        confusion_matrix[i][j][2] += 1
+                    else:
+                        confusion_matrix[i][j][3] += 1
+                j += 1
+            i += 1
+
+        return np.array(confusion_matrix)
+
     def test(self, input_test_data, expected_output, epsilon=0.05):
         true_positive = 0
         true_negative = 0

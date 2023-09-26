@@ -3,8 +3,7 @@ import random
 import plotly.express as px
 import pandas as pd
 import json
-from datetime import datetime
-
+import plotly.figure_factory as ff
 from ex3.C.main import apply_noise
 from perceptrons.multi_perceptron import *
 import plotly.graph_objects as go
@@ -87,6 +86,39 @@ def graph_test_metrics(test_metrics):
         title='Metrics vs. Max Noise',
         legend_title='Metrics'
     )
+
+    # Show the plot
+    fig.show()
+
+
+def graph_confusion_matrix(matrix, i, j):
+    confusion_matrix = matrix[i - 1][j - 1]
+    class_labels = [i, j]
+
+    fig = ff.create_annotated_heatmap(z=confusion_matrix,
+                                      x=class_labels,
+                                      y=class_labels,
+                                      colorscale='Viridis')
+
+    fig.update_layout(title='Confusion Matrix',
+                      xaxis_title='Predicted',
+                      yaxis_title='Actual')
+
+    # Add custom annotations to the cells for clarity (optional)
+    annotations = []
+    for i, row in enumerate(confusion_matrix):
+        for j, val in enumerate(row):
+            annotations.append(
+                go.layout.Annotation(
+                    x=class_labels[j],
+                    y=class_labels[i],
+                    text=str(val),
+                    showarrow=False,
+                    font=dict(color='white' if i == j else 'black')
+                )
+            )
+
+    fig.update_layout(annotations=annotations)
 
     # Show the plot
     fig.show()
@@ -188,6 +220,47 @@ def average_test(data):
         test_results[idx] /= NUM_ITERATIONS
 
     return test_results
+
+
+def average_matrix_confusion(data):
+    config, input_data, expected_ouput, test_data, test_output = data[0], data[1], data[2], data[3], data[4]
+
+    NUM_ITERATIONS = 50
+
+    sum_matrix = None
+
+    for _ in range(NUM_ITERATIONS):
+        neural_network = MultiPerceptron(
+            INPUT_SIZE,
+            config["hidden_layer_amount"],
+            config["neurons_per_layer"],
+            OUTPUT_SIZE,
+            theta_logistic,
+            theta_logistic_derivative,
+            config["hidden_layer_amount"],
+            config["activation_function_beta"],
+        )
+
+        neural_network.train(
+            config["epsilon"],
+            config["limit"],
+            config["optimization_method"]["alpha"],
+            np.array(input_data),
+            np.array(expected_ouput),
+            collect_metrics,
+            config["batch_size"]
+        )
+
+        confusion_matrix = neural_network.confusion_matrix(test_data, test_output)
+
+        if sum_matrix is None:
+            sum_matrix = confusion_matrix
+        else:
+            sum_matrix += confusion_matrix
+
+    return sum_matrix
+
+
 
 
 def average_train_parallel():
@@ -328,6 +401,59 @@ def average_test_parallel():
 
     graph_test_metrics(scores)
 
+def average_test_confusion_parallel():
+    with open("./config.json") as file:
+        config = json.load(file)
+
+    if config["seed"] != -1:
+        random.seed(config["seed"])
+
+    # Levantamos el input
+    input_data = []
+    with open(config["training_data_input"], 'r') as file:
+        temp = []
+        for line in file:
+            numbers = line.strip().split()
+
+            temp.extend(map(int, numbers))
+
+            if len(temp) == INPUT_SIZE:
+                input_data.append(temp)
+                temp = []
+
+    if temp:
+        input_data.append(temp)
+
+    # Levantamos el output
+    expected_output = []
+    with open(config["training_data_output"], 'r') as file:
+        for line in file:
+            numbers = line.strip().split()
+            arr = []
+            for elem in numbers:
+                arr.append(int(elem))
+            expected_output.append(arr)
+
+    train_input = input_data
+    test_input = input_data
+
+    train_output = expected_output
+    test_output = expected_output
+
+    scores = []
+    data = []
+    for i in range(4):
+        data.append([config, train_input, train_output, apply_noise(test_input, 0.1 * i), test_output])
+
+    with Pool(processes=5) as pool:
+        results = pool.map(average_matrix_confusion, data)
+
+        for elem in results:
+            scores.append(elem)
+
+    for matrix in scores:
+        graph_confusion_matrix(matrix, 8,9)
+
 
 if __name__ == "__main__":
-    average_test_parallel()
+    average_test_confusion_parallel()
