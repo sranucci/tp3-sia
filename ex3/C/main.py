@@ -7,8 +7,9 @@ OUTPUT_SIZE = 10
 INPUT_SIZE = 35
 
 
-def collect_metrics(metrics, error, iteration):
+def collect_metrics(metrics, error, error_test, iteration):
     metrics["error"].append(error)
+    metrics["error_test"].append(error_test)
     metrics["iterations"] = iteration
 
 
@@ -102,5 +103,5 @@ def main():
 
 
 
-main()
+#main()
 

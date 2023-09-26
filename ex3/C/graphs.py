@@ -1,3 +1,5 @@
+import random
+
 import plotly.express as px
 import pandas as pd
 import json
@@ -10,6 +12,28 @@ import plotly.graph_objects as go
 OUTPUT_SIZE = 10
 INPUT_SIZE = 35
 
+def graph_mse_values_no_change(error_train, error_test):
+    traces = []
+    for idx, elem in enumerate(zip(error_train, error_test)):
+        traces.append(go.Scatter(x=[i for i in range(len(elem[0]))], y=elem[0], mode='lines', name=f'EDS in training with {idx * 0.1} noise'))
+        traces.append(go.Scatter(x=[i for i in range(len(elem[1]))], y=elem[1], mode='lines', name=f'EDS in testing with {idx * 0.1} noise'))
+
+
+    # Create the layout for the plot
+    layout = go.Layout(
+        title='EDS for training and testing',
+        xaxis=dict(title='Epochs'),
+        yaxis=dict(title='EDS'),
+
+    )
+
+    # Create the figure and add traces
+    fig = go.Figure(data=traces, layout=layout)
+
+    fig.update_yaxes(range=[0, 3.5])
+
+    # Show the plot
+    fig.show()
 
 def graph_mse_values(mse_values):
     # Create a trace for each configuration
@@ -75,13 +99,15 @@ def graph_test_results(test_results):
         fig.show()
 
 
-def collect_metrics(metrics, error, iteration):
+def collect_metrics(metrics, error, error_test, iteration):
     metrics["error"].append(error)
+    metrics["error_test"].append(error_test)
     metrics["iterations"] = iteration
 
 def average_train(data):
-    config, input_data, expected_ouput = data[0], data[1], data[2]
+    config, train_input, train_output, test_input, test_output = data[0], data[1], data[2], data[3], data[4]
     errors = []
+    errors_test = []
     for _ in range(10):
         neural_network = MultiPerceptron(
             INPUT_SIZE,
@@ -98,23 +124,35 @@ def average_train(data):
             config["epsilon"],
             config["limit"],
             config["optimization_method"]["alpha"],
-            np.array(input_data),
-            np.array(expected_ouput),
+            np.array(train_input),
+            np.array(train_output),
+            np.array(test_input),
+            np.array(test_output),
             collect_metrics,
             config["batch_size"]
         )
         errors.append(metrics["error"])
+        errors_test.append(metrics["error_test"])
 
-    sum_errors = np.zeros(len(errors[0]))
+    sum_errors_train = np.zeros(len(errors[0]))
 
     for elem in errors:
         for idx, err in enumerate(elem):
-            sum_errors[idx] += err
+            sum_errors_train[idx] += err
 
-    for idx in range(len(sum_errors)):
-        sum_errors[idx] /= len(errors)
+    for idx in range(len(sum_errors_train)):
+        sum_errors_train[idx] /= len(errors)
 
-    return sum_errors
+    sum_errors_test = np.zeros(len(errors[0]))
+
+    for elem in errors_test:
+        for idx, err in enumerate(elem):
+            sum_errors_test[idx] += err
+
+    for idx in range(len(sum_errors_test)):
+        sum_errors_test[idx] /= len(errors)
+
+    return sum_errors_train, sum_errors_test
 
 
 def average_test(data):
@@ -194,21 +232,43 @@ def average_train_parallel():
                 arr.append(int(elem))
             expected_output.append(arr)
 
-    errors_per_change = []
+    train_error = []
+    test_error = []
+
+    combined = []
+    for i, o in zip(input_data, expected_output):
+        combined.append([i,o])
+
+    random.shuffle(combined)
+    input_data.clear()
+    expected_output.clear()
+
+    for i, o in combined:
+        input_data.append(i)
+        expected_output.append(o)
+
+    TRAIN = 7
+
+    train_input = input_data[:TRAIN]
+    test_input = input_data[TRAIN:]
+
+    train_output = expected_output[:TRAIN]
+    test_output = expected_output[TRAIN:]
 
     data = []
-    for i in range(6):
-        new_config = copy.deepcopy(config)
-        new_config["neurons_per_layer"] += i
-        data.append([new_config, input_data, expected_output])
+    for i in range(3):
+        data.append([config, train_input, train_output,
+                     apply_noise(test_input, 0.1 * i),
+                     test_output])
 
-    with Pool(processes=5) as pool:
+    with Pool(processes=3) as pool:
         results = pool.imap_unordered(average_train, data)
 
         for elem in results:
-            errors_per_change.append(elem)
+            train_error.append(elem[0])
+            test_error.append(elem[1])
 
-    graph_mse_values(errors_per_change)
+    graph_mse_values_no_change(train_error, test_error)
 
 
 def average_test_parallel():
@@ -247,6 +307,7 @@ def average_test_parallel():
     test_data = apply_noise(input_data, 0.01)
 
     scores_per_change = []
+
     data = []
     for i in range(6):
         new_config = copy.deepcopy(config)
@@ -263,4 +324,4 @@ def average_test_parallel():
 
 
 if __name__ == "__main__":
-    average_test_parallel()
+    average_train_parallel()
