@@ -26,7 +26,11 @@ def apply_noise(inputs, max_noise):
     for number in inputs:
         altered = copy.deepcopy(number)
         for i in range(len(altered)):
-            altered[i] = min(altered[i] + random.uniform(0, max_noise), 1)
+            noise = random.uniform(0, max_noise)
+            change = random.randint(0, 1)
+            if change == 0:
+                change = -1
+            altered[i] += max(min(altered[i] + change * noise, 1), 0)
         altered_inputs.append(altered)
 
     return altered_inputs

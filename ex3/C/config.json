@@ -16,7 +16,7 @@
   "batch_size": 1,
 
   "hidden_layer_amount": 1,
-  "neurons_per_layer": 3,
+  "neurons_per_layer": 10,
 
   "optimization_method": {
     "type": "momentum",

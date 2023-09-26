@@ -262,7 +262,7 @@ def average_train_parallel():
                      test_output])
 
     with Pool(processes=3) as pool:
-        results = pool.imap_unordered(average_train, data)
+        results = pool.map(average_train, data)
 
         for elem in results:
             train_error.append(elem[0])
