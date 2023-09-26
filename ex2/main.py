@@ -8,8 +8,13 @@ from perceptrons.selection_methods import *
 
 
 def collect_metrics(metrics, weights, error, iterations):
-    # TODO: completar
-    pass
+    metrics["error"].append(error)
+    metrics["iteration"] = iterations
+
+def export_metrics(metrics):
+    now = datetime.now().strftime("%d-%m-%Y_%H%M%S")
+    with open(f"results/resultsABC_{now}.json", mode="w+") as file:
+        file.write(json.dumps(metrics, indent=4))
 
 
 def run_algorithm(input_data, output_data, config):
@@ -34,6 +39,8 @@ def run_algorithm(input_data, output_data, config):
             quit("Invalid theta")
     else:
         quit("invalid method type")
+
+    export_metrics(metrics)
     return min_weights
 
 
@@ -67,7 +74,7 @@ def run_algorithm_with_kfold(input_data, output_data, config):
                 input_training_data.extend(input_data[item])
                 output_training_data.extend(output_data[item])
 
-        # TODO RANA: ver tenma de la conversion que esta tirando excepcion
+        # TODO RANA: ver tenma de la conversion que esta tirando excepcion (resuelto con un learning rate bajo)
         min_weights = run_algorithm(input_training_data, output_training_data, config)
         # creamos los datos de testeo, todos menos el k_fold
 
@@ -110,6 +117,7 @@ def main():
         error = run_algorithm_with_kfold(input_data, output_data, config)
     else:
         quit("Invalid selection method")
+
 
     print(error)
 
