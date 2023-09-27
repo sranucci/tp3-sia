@@ -16,6 +16,14 @@ def export_metrics(metrics):
     with open(f"results/resultsABC_{now}.json", mode="w+") as file:
         file.write(json.dumps(metrics, indent=4))
 
+def normalize_output(output, min_function, max_function):
+    max_output = max(output)
+    min_output = min(output)
+    normalized = []
+    for elem in output:
+        normalized.append((elem - min_output) / (max_output - min_output) * (max_function - min_function) + min_function)
+
+    return normalized
 
 def run_algorithm(input_data, output_data, config):
     # Corremos los algoritmos
@@ -26,13 +34,15 @@ def run_algorithm(input_data, output_data, config):
 
     elif config["method"]["type"] == "non_linear":
         if config["method"]["theta"] == "tanh":
-            min_weights, metrics = perceptron(input_data, output_data, config["learning_constant"], config["epsilon"],
+            normalized = normalize_output(output_data, -1, 1)
+            min_weights, metrics = perceptron(input_data, normalized, config["learning_constant"], config["epsilon"],
                                               update_weights_non_linear, error_non_linear, theta_logistic,
                                               collect_metrics,
                                               config["limit"], config["method"]["beta"], theta_tanh_derivative)
 
         elif config["method"]["theta"] == "logistic":
-            min_weights, metrics = perceptron(input_data, output_data, config["learning_constant"], config["epsilon"],
+            normalized = normalize_output(output_data, 0, 1)
+            min_weights, metrics = perceptron(input_data, normalized, config["learning_constant"], config["epsilon"],
                                               update_weights_non_linear, error_non_linear, theta_tanh, collect_metrics,
                                               config["limit"], config["method"]["beta"], theta_logistic_derivative)
         else:
