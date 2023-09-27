@@ -16,6 +16,19 @@ pip install -r requirements.txt
 python ./ex2/main.py
 ```
 
+## Configuración Ejercicio 1
+| Campo             | Descripción                                                                               | Valores aceptados                     |  
+|-------------------|-------------------------------------------------------------------------------------------|---------------------------------------|
+| run_and/run_xor   | Booleano para correr perceptron escalonado con los datos del 'and'.                       | True o False.                         |
+| learning_constant | Valor multiplicador usado en la actualización de los pesos.                               | Numero de punto flotante entre 0 y 1. |
+| limit             | Maxima cantidad de iteraciones al entrenar.                                               | Numero entero mayor a 0.              |
+| print_wmin        | Booleano para imprimir los pesos w minimos despues de la ejecucion.                       | True o False.                         |
+| generate_gif      | Booleano para generar un gif con las rectas del peso de cada iteracion.                   | True o False.                         |
+| run_average       | Booleano para generar grafico de un promedio de cierta cantidad de corridas.              | True o False.                         |
+| number_of_runs    | Numero entero de cantidad de corridas a promediar.                                        | Numero entero mayor a 0.              |
+| run_and_data_set  | Booleano para correr el promedio con el input de 'and'. Caso contrario se corre con 'xor' | True o False.                         |
+
+
 ## Configuración Ejercicio 2
 | Campo             | Descripción                                                                    | Valores aceptados                                                            |  
 |-------------------|--------------------------------------------------------------------------------|------------------------------------------------------------------------------|
