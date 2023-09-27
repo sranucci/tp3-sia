@@ -56,6 +56,38 @@ python ./ex2/main.py
 | folds      | Solo para "k-fold". Especifica la cantidad de folds que se generan.                | Numero entero mayor a 0, menor a la cantidad de datos. | 
 
 
+## Configuración Ejercicio 3 A
+| Campo                    | Descripción                                                                               | Valores aceptados                                                            |  
+|--------------------------|-------------------------------------------------------------------------------------------|------------------------------------------------------------------------------|
+| seed                     | Permite especificar el numero inicial usado al generar los valores aleatorios.            | Debe entero positivo. Tambien se puede usar -1 si no se quiere usar un seed. |
+| learning_constant        | Valor multiplicador usado en la actualización de los pesos.                               | Numero de punto flotante entre 0 y 1.                                        |
+| limit                    | Maxima cantidad de iteraciones al entrenar.                                               | Numero entero mayor a 0.                                                     | 
+| epsilon                  | Valor de error minimo acceptable.                                                         | Numero de punto flotante o entero mayor o igual a 0.                         |
+| batch_size               | Tamano de datos para usar al entrenar en cada epoca.                                      | Numero entero entre 0 y la cantidad de datos que se usan para entrenar       |
+| hidden_layer_amount      | Cantidad de capas intermedias                                                             | Numero entero mayor a 0.                                                     | 
+| neurons_per_layer        | Cantidad de nueronas por capa intermedia                                                  | Numero entero mayor a 0.                                                     |
+| activation_function_beta | Valor de beta para la funcion logistica.                                                  | Numero de punto flotante o entero mayor o igual a 0.                         |  
+| optimization_method      | Metodo de optimizacion                                                                    | Objeto json con configuración. [ Ver tabla 4]                                |
+| generate_error_graph     | Booleano para generar grafico de error a traves de iteraciones                            | True o False.                                                                |
+| print_final_values       | Booleano para imprimir por salida los valores que devuelve el multicapa con los del input | True o False.                                                                |
+
+
+## Configuración Ejercicio 3 B
+| Campo                    | Descripción                                                                    | Valores aceptados                                                            |  
+|--------------------------|--------------------------------------------------------------------------------|------------------------------------------------------------------------------|
+| seed                     | Permite especificar el numero inicial usado al generar los valores aleatorios. | Debe entero positivo. Tambien se puede usar -1 si no se quiere usar un seed. |
+| learning_constant        | Valor multiplicador usado en la actualización de los pesos.                    | Numero de punto flotante entre 0 y 1.                                        |
+| limit                    | Maxima cantidad de iteraciones al entrenar.                                    | Numero entero mayor a 0.                                                     | 
+| epsilon                  | Valor de error minimo acceptable.                                              | Numero de punto flotante o entero mayor o igual a 0.                         |
+| batch_size               | Tamano de datos para usar al entrenar en cada epoca.                           | Numero entero entre 0 y la cantidad de datos que se usan para entrenar       |
+| hidden_layer_amount      | Cantidad de capas intermedias                                                  | Numero entero mayor a 0.                                                     | 
+| neurons_per_layer        | Cantidad de nueronas por capa intermedia                                       | Numero entero mayor a 0.                                                     |
+| activation_function_beta | Valor de beta para la funcion logistica.                                       | Numero de punto flotante o entero mayor o igual a 0.                         |  
+| optimization_method      | Metodo de optimizacion                                                         | Objeto json con configuración. [ Ver tabla 4]                                |
+| print_results            | Booleano para imprimir error final, accuracy, precision, recall y f1 score     | True o False.                                                                |
+| generate_graph           | Booleano para generar grafico de salida esperada y la salida computada         | True o False.                                                                |
+
+
 ## Configuración Ejercicio 3 C
 | Campo                    | Descripción                                                                    | Valores aceptados                                                            |  
 |--------------------------|--------------------------------------------------------------------------------|------------------------------------------------------------------------------|
