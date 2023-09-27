@@ -4,19 +4,21 @@
   "training_data_output": "../../training_data/ej3-C-respuestas.txt",
 
   "selection_method" : {
-    "size": 5000,
     "method": "simple",
-    "proportion": 0.9
+    "proportion": 0.7
   },
+
+  "max_noise": 0.0,
+
   "activation_function_beta": 1,
 
   "learning_constant": 0.05,
-  "limit": 600,
+  "limit": 1000,
   "epsilon": 0,
   "batch_size": 1,
 
   "hidden_layer_amount": 1,
-  "neurons_per_layer": 3,
+  "neurons_per_layer": 10,
 
   "optimization_method": {
     "type": "momentum",

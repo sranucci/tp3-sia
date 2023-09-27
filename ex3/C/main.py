@@ -25,7 +25,16 @@ def apply_noise(inputs, max_noise):
     for number in inputs:
         altered = copy.deepcopy(number)
         for i in range(len(altered)):
-            altered[i] = min(altered[i] + random.uniform(0, max_noise), 1)
+            noise = random.uniform(0, max_noise)
+            change = random.randint(0, 1)
+            if change == 0:
+                change = -1
+            if altered[i] + change * noise > 1:
+                altered[i] = 1
+            elif altered[i] + change * noise < 0:
+                altered[i] = 0
+            else:
+                altered[i] = altered[i] + change * noise
         altered_inputs.append(altered)
 
     return altered_inputs
@@ -64,6 +73,24 @@ def main():
                 arr.append(int(elem))
             expected_output.append(arr)
 
+
+    if config["selection_method"]["method"] == "simple":
+        size = round(config["selection_method"]["proportion"] * len(input_data))
+        training_input = input_data[:size]
+        training_output = expected_output[:size]
+
+        testing_input = input_data[size:]
+        testing_output = expected_output[size:]
+
+    elif config["selection_method"]["method"] == "none":
+        training_input = input_data
+        training_output = expected_output
+
+        testing_input = input_data
+        testing_output = expected_output
+    else:
+        raise ValueError("Invalid selection method")
+
     neural_network = MultiPerceptron(
         INPUT_SIZE,
         config["hidden_layer_amount"],
@@ -80,8 +107,8 @@ def main():
         config["epsilon"],
         config["limit"],
         config["optimization_method"]["alpha"],
-        np.array(input_data),
-        np.array(expected_output),
+        np.array(training_input),
+        np.array(training_output),
         collect_metrics,
         config["batch_size"]
     )
@@ -90,14 +117,18 @@ def main():
     metrics["training error"] = error
     metrics["time elapsed"] = end_time - start_time
 
-    export_metrics(metrics)
-
-    accuracy, precision, recall, f1_score = neural_network.test(np.array(input_data), np.array(expected_output), 0.05)
+    accuracy, precision, recall, f1_score = neural_network.test(
+        np.array(apply_noise(testing_input, config["max_noise"])),
+        np.array(testing_output),
+        0.05
+    )
 
     metrics["accuracy"] = accuracy
     metrics["precision"] = precision
     metrics["recall"] = recall
     metrics["f1 Score"] = f1_score
+
+    export_metrics(metrics)
 
 
 
