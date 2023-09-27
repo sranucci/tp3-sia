@@ -11,12 +11,14 @@ import plotly.graph_objects as go
 OUTPUT_SIZE = 10
 INPUT_SIZE = 35
 
+
 def graph_mse_values_no_change(error_train, error_test):
     traces = []
     for idx, elem in enumerate(zip(error_train, error_test)):
-        traces.append(go.Scatter(x=[i for i in range(len(elem[0]))], y=elem[0], mode='lines', name=f'EDS in training with {idx * 0.1} noise'))
-        traces.append(go.Scatter(x=[i for i in range(len(elem[1]))], y=elem[1], mode='lines', name=f'EDS in testing with {idx * 0.1} noise'))
-
+        traces.append(go.Scatter(x=[i for i in range(len(elem[0]))], y=elem[0], mode='lines',
+                                 name=f'EDS in training with {idx * 0.1} noise'))
+        traces.append(go.Scatter(x=[i for i in range(len(elem[1]))], y=elem[1], mode='lines',
+                                 name=f'EDS in testing with {idx * 0.1} noise'))
 
     # Create the layout for the plot
     layout = go.Layout(
@@ -34,13 +36,15 @@ def graph_mse_values_no_change(error_train, error_test):
     # Show the plot
     fig.show()
 
+
 def graph_mse_values(mse_values):
     # Create a trace for each configuration
     mse_values = [elem for elem in mse_values]
 
     traces = []
     for idx, mse in enumerate(mse_values):
-        trace = go.Scatter(x=[i for i in range(len(mse))], y=mse, mode='lines', name=f'Neurons in hidden layer: {idx + 10}')
+        trace = go.Scatter(x=[i for i in range(len(mse))], y=mse, mode='lines',
+                           name=f'Neurons in hidden layer: {idx + 10}')
         traces.append(trace)
 
     # Create the layout for the plot
@@ -55,6 +59,7 @@ def graph_mse_values(mse_values):
 
     # Show the plot
     fig.show()
+
 
 def graph_test_metrics(test_metrics):
     # Create a DataFrame
@@ -91,22 +96,23 @@ def graph_test_metrics(test_metrics):
     fig.show()
 
 
-def graph_confusion_matrix(matrix, i, j):
-    confusion_matrix = matrix[i - 1][j - 1]
-    class_labels = [i, j]
+def graph_confusion_matrix(matrix, noise):
+    class_labels = [i for i in range(len(matrix))]
 
-    fig = ff.create_annotated_heatmap(z=confusion_matrix,
+    noise_text = "{:.1f}".format(noise)
+
+    fig = ff.create_annotated_heatmap(z=matrix,
                                       x=class_labels,
                                       y=class_labels,
                                       colorscale='Viridis')
 
-    fig.update_layout(title='Confusion Matrix',
+    fig.update_layout(title=f'Confusion Matrix with Max Noise {noise_text}',
                       xaxis_title='Predicted',
                       yaxis_title='Actual')
 
     # Add custom annotations to the cells for clarity (optional)
     annotations = []
-    for i, row in enumerate(confusion_matrix):
+    for i, row in enumerate(matrix):
         for j, val in enumerate(row):
             annotations.append(
                 go.layout.Annotation(
@@ -128,6 +134,7 @@ def collect_metrics(metrics, error, error_test, iteration):
     metrics["error"].append(error)
     metrics["error_test"].append(error_test)
     metrics["iterations"] = iteration
+
 
 def average_train(data):
     config, train_input, train_output, test_input, test_output = data[0], data[1], data[2], data[3], data[4]
@@ -261,8 +268,6 @@ def average_matrix_confusion(data):
     return sum_matrix
 
 
-
-
 def average_train_parallel():
     with open("./config.json") as file:
         config = json.load(file)
@@ -301,7 +306,7 @@ def average_train_parallel():
 
     combined = []
     for i, o in zip(input_data, expected_output):
-        combined.append([i,o])
+        combined.append([i, o])
 
     random.shuffle(combined)
     input_data.clear()
@@ -383,9 +388,9 @@ def average_test_parallel():
     TRAIN = 7
 
     train_input = input_data
-    test_input = input_data
-
     train_output = expected_output
+
+    test_input = input_data
     test_output = expected_output
 
     scores = []
@@ -400,6 +405,7 @@ def average_test_parallel():
             scores.append(elem)
 
     graph_test_metrics(scores)
+
 
 def average_test_confusion_parallel():
     with open("./config.json") as file:
@@ -435,25 +441,22 @@ def average_test_confusion_parallel():
             expected_output.append(arr)
 
     train_input = input_data
-    test_input = input_data
-
     train_output = expected_output
-    test_output = expected_output
 
     scores = []
     data = []
     for i in range(4):
-        data.append([config, train_input, train_output, apply_noise(test_input, 0.1 * i), test_output])
+        data.append([config, train_input, train_output, apply_noise(input_data, i * 0.1), expected_output])
 
-    with Pool(processes=5) as pool:
+    with Pool(processes=4) as pool:
         results = pool.map(average_matrix_confusion, data)
 
         for elem in results:
             scores.append(elem)
-
+    i = 0
     for matrix in scores:
-        graph_confusion_matrix(matrix, 8,9)
-
+        graph_confusion_matrix(matrix, i * 0.1)
+        i+=1
 
 if __name__ == "__main__":
     average_test_confusion_parallel()

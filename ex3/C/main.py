@@ -30,7 +30,12 @@ def apply_noise(inputs, max_noise):
             change = random.randint(0, 1)
             if change == 0:
                 change = -1
-            altered[i] += max(min(altered[i] + change * noise, 1), 0)
+            if altered[i] + change * noise > 1:
+                altered[i] = 1
+            elif altered[i] + change * noise < 0:
+                altered[i] = 0
+            else:
+                altered[i] = altered[i] + change * noise
         altered_inputs.append(altered)
 
     return altered_inputs

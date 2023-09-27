@@ -11,7 +11,7 @@
   "activation_function_beta": 1,
 
   "learning_constant": 0.05,
-  "limit": 1000,
+  "limit": 2000,
   "epsilon": 0,
   "batch_size": 1,
 
