@@ -4,6 +4,7 @@ from perceptrons.single_perceptron import *
 from linear_perceptron import *
 from non_linear_perceptron import *
 import csv
+from traing import test
 from perceptrons.selection_methods import *
 
 
@@ -13,7 +14,7 @@ def collect_metrics(metrics, weights, error, iterations):
 
 def export_metrics(metrics):
     now = datetime.now().strftime("%d-%m-%Y_%H%M%S")
-    with open(f"results/resultsABC_{now}.json", mode="w+") as file:
+    with open(f"results/results_{now}.json", mode="w+") as file:
         file.write(json.dumps(metrics, indent=4))
 
 def normalize_output(output, min_function, max_function):
@@ -24,6 +25,33 @@ def normalize_output(output, min_function, max_function):
         normalized.append((elem - min_output) / (max_output - min_output) * (max_function - min_function) + min_function)
 
     return normalized
+def normalize_input(data, min_function, max_function):
+    if not data:
+        return []
+
+    # Transpose the data matrix to work with columns
+    columns = list(zip(*data))
+
+    normalized_data = []
+
+    for column in columns:
+        min_value = min(column)
+        max_value = max(column)
+
+        if min_value == max_value:
+            # Avoid division by zero if all values are the same
+            normalized_column = [0.0] * len(column)
+        else:
+            # Normalize using the custom function (tanh in this case)
+            normalized_column = [np.tanh(min_function + ((x - min_value) / (max_value - min_value)) * (max_function - min_function)) for x in column]
+
+        normalized_data.append(normalized_column)
+
+    # Transpose the normalized data back to the original format
+    normalized_data = list(zip(*normalized_data))
+
+    return normalized_data
+
 
 def run_algorithm(input_data, output_data, config):
     # Corremos los algoritmos
@@ -31,20 +59,23 @@ def run_algorithm(input_data, output_data, config):
         min_weights, metrics = perceptron(input_data, output_data, config["learning_constant"], config["epsilon"],
                                           update_weights_linear, error_linear, theta_linear, collect_metrics,
                                           config["limit"], 1)
-
+        test(input_data, output_data, min_weights, theta_linear, config["method"]["beta"])
     elif config["method"]["type"] == "non_linear":
         if config["method"]["theta"] == "tanh":
             normalized = normalize_output(output_data, -1, 1)
             min_weights, metrics = perceptron(input_data, normalized, config["learning_constant"], config["epsilon"],
-                                              update_weights_non_linear, error_non_linear, theta_logistic,
+                                              update_weights_non_linear, error_non_linear, theta_tanh,
                                               collect_metrics,
                                               config["limit"], config["method"]["beta"], theta_tanh_derivative)
+            test(input_data, normalized, min_weights, theta_linear, config["method"]["beta"])
 
         elif config["method"]["theta"] == "logistic":
             normalized = normalize_output(output_data, 0, 1)
             min_weights, metrics = perceptron(input_data, normalized, config["learning_constant"], config["epsilon"],
-                                              update_weights_non_linear, error_non_linear, theta_tanh, collect_metrics,
+                                              update_weights_non_linear, error_non_linear, theta_logistic, collect_metrics,
                                               config["limit"], config["method"]["beta"], theta_logistic_derivative)
+            test(input_data, normalized, min_weights, theta_linear, config["method"]["beta"])
+
         else:
             quit("Invalid theta")
     else:
@@ -60,10 +91,12 @@ def test_weights(input_test_data, output_test_data, weights, config):
         error = generalization(input_test_data, output_test_data, weights, error_linear, theta_linear, 1)
     elif config["method"]["type"] == "non_linear":
         if config["method"]["theta"] == "tanh":
-            error = generalization(input_test_data, output_test_data, weights, error_non_linear, theta_tanh,
+            normalized = normalize_output(output_test_data, -1, 1)
+            error = generalization(input_test_data, normalized, weights, error_non_linear, theta_tanh,
                                    config["method"]["beta"])
         elif config["method"]["theta"] == "logistic":
-            error = generalization(input_test_data, output_test_data, weights, error_non_linear, theta_logistic,
+            normalized = normalize_output(output_test_data, 0, 1)
+            error = generalization(input_test_data, normalized, weights, error_non_linear, theta_logistic,
                                    config["method"]["beta"])
         else:
             quit("Invalid theta")
@@ -128,8 +161,13 @@ def main():
     else:
         quit("Invalid selection method")
 
-
+    #f = open("results/test_data.csv", "w+")
+    #outputs= generate_results(convert_input(input_test_data), min_weights, theta_linear , config["method"]["beta"])
+    #for data_input, output in zip(outputs, output_data):
+    #    # aca test
+    #    print(f"{data_input},{output}", file=f)
+    #f.close()
     print(error)
-
+    print()
 
 main()

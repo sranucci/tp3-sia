@@ -17,7 +17,7 @@ def convert_input(data_input):
 def initialize_weights(data_size):
     weights = []
     for _ in range(data_size):
-        weights.append(np.random.uniform(-10, 10))  # TODO check
+        weights.append(np.random.uniform(-1, 1))  # TODO check
     return np.array(weights)
 
 
@@ -44,13 +44,13 @@ def perceptron(data_input, data_output, learning_constant, epsilon, update_weigh
     collect_metrics(metrics, weights, -1, 0)
 
     converted_input = convert_input(data_input)
-
+    f= open("../ex2/results/salidaperceptron.csv","w+")
     while min_error > epsilon and iterations < limit:
         idx = randint(0, data_size - 1)
 
         x_vector = converted_input[idx]  # convert x from array to numpy (to make vectorial operations)
         activation = compute_activation(x_vector, weights, theta, beta)
-
+        print(f"{activation},{data_output[idx]}",file=f)
         update_weights(learning_constant, activation, converted_input[idx], data_output[idx], weights, theta_derivative,
                        beta)
 
@@ -63,7 +63,7 @@ def perceptron(data_input, data_output, learning_constant, epsilon, update_weigh
             w_min = copy.copy(weights)
 
         iterations += 1
-
+    f.close()
     return w_min, metrics
 
 
